@@ -16,8 +16,6 @@ import static org.springframework.test.context.jdbc.Sql.ExecutionPhase.AFTER_TES
 import static org.springframework.test.context.jdbc.Sql.ExecutionPhase.BEFORE_TEST_METHOD;
 
 @DataJpaTest
-@Sql(scripts = "/db-tests/colors/create-color.sql", executionPhase = BEFORE_TEST_METHOD)
-@Sql(scripts = "/db-tests/colors/cleanup-color.sql", executionPhase = AFTER_TEST_METHOD)
 class ColorDaoTest {
 
     @Autowired

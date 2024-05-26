@@ -1,0 +1,7 @@
+databaseChangeLog:
+  - changeSet:
+      id : init-database
+      author: Jonathan JUSSEAUME
+      changes:
+        - sqlFile:
+            path : classpath:/db/changelog/structure/scripts/create-tables.sql

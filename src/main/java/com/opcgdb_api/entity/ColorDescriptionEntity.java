@@ -2,13 +2,11 @@ package com.opcgdb_api.entity;
 
 import com.opcgdb_api.entity.key.ColorDescriptionKey;
 import lombok.Getter;
-import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import javax.persistence.*;
 
 @Getter
-@Setter
 @Accessors(chain = true)
 @Entity
 @Table(name = "UT_COLOR_DESCRIPTION", schema = "public")

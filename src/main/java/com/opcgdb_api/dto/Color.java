@@ -2,6 +2,7 @@ package com.opcgdb_api.dto;
 
 import com.opcgdb_api.entity.ColorDescriptionEntity;
 import com.opcgdb_api.entity.ColorEntity;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -11,6 +12,7 @@ import lombok.experimental.Accessors;
 @Setter
 @Accessors(chain = true)
 @NoArgsConstructor
+@EqualsAndHashCode
 public class Color {
 
     private Long id;

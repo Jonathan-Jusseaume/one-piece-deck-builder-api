@@ -2,6 +2,7 @@ package com.opcgdb_api.dto;
 
 import com.opcgdb_api.entity.AttributeDescriptionEntity;
 import com.opcgdb_api.entity.AttributeEntity;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -11,6 +12,7 @@ import lombok.experimental.Accessors;
 @Setter
 @Accessors(chain = true)
 @NoArgsConstructor
+@EqualsAndHashCode
 public class Attribute {
 
     private Long id;

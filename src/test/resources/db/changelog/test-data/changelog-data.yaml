@@ -9,3 +9,7 @@ databaseChangeLog:
             path : classpath:/db/changelog/test-data/scripts/attributes.sql
         - sqlFile:
             path : classpath:/db/changelog/test-data/scripts/rarities.sql
+        - sqlFile:
+            path : classpath:/db/changelog/test-data/scripts/types.sql
+        - sqlFile:
+            path : classpath:/db/changelog/test-data/scripts/tags.sql

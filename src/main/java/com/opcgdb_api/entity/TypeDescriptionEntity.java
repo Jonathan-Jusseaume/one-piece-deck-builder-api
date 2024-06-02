@@ -2,13 +2,11 @@ package com.opcgdb_api.entity;
 
 import com.opcgdb_api.entity.key.TypeDescriptionKey;
 import lombok.Getter;
-import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import javax.persistence.*;
 
 @Getter
-@Setter
 @Accessors(chain = true)
 @Entity
 @Table(name = "UT_TYPE_DESCRIPTION", schema = "public")

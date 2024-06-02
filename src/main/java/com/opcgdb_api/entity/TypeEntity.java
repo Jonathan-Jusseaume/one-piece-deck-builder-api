@@ -1,14 +1,12 @@
 package com.opcgdb_api.entity;
 
 import lombok.Getter;
-import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import javax.persistence.*;
 import java.util.Set;
 
 @Getter
-@Setter
 @Accessors(chain = true)
 @Entity
 @Table(name = "UT_TYPE", schema = "public")

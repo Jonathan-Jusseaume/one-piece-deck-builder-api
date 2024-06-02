@@ -35,7 +35,7 @@ class RarityServiceTest {
         );
 
         List<Rarity> actual = this.rarityService.list();
-        assertThat(actual).containsAll(expected);
+        assertThat(actual).isEqualTo(expected);
     }
 
 }

@@ -1,11 +1,11 @@
 package com.opcgdb_api.entity;
 
-import lombok.Data;
+import lombok.Getter;
 
 import javax.persistence.*;
 import java.util.Set;
 
-@Data
+@Getter
 @Entity
 @Table(name = "UT_TAG")
 public class TagEntity {

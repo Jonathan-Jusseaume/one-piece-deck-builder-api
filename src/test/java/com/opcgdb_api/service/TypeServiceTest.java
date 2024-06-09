@@ -1,6 +1,5 @@
 package com.opcgdb_api.service;
 
-import com.opcgdb_api.dto.Attribute;
 import com.opcgdb_api.dto.Type;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.extension.ExtendWith;

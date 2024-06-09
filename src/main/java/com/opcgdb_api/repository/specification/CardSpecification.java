@@ -1,17 +1,15 @@
 package com.opcgdb_api.repository.specification;
 
 import com.opcgdb_api.entity.*;
+import lombok.experimental.UtilityClass;
 import org.springframework.data.jpa.domain.Specification;
 
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.SetJoin;
 import java.util.Set;
 
+@UtilityClass
 public class CardSpecification {
-
-    private CardSpecification() throws InstantiationException {
-        throw new InstantiationException("Can't instantiate CardSpecification");
-    }
 
     public static Specification<CardEntity> distinct() {
         return (root, query, cb) -> {

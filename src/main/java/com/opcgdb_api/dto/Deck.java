@@ -9,7 +9,6 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import java.sql.Date;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;

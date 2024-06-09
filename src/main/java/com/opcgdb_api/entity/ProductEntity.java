@@ -5,7 +5,7 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import javax.persistence.*;
-import java.sql.Date;
+import java.time.Instant;
 import java.util.Set;
 
 @Getter
@@ -20,7 +20,7 @@ public class ProductEntity {
     private String id;
 
     @Column(name = "RELEASE_DATE")
-    private Date releaseDate;
+    private Instant releaseDate;
 
     @OneToMany(fetch = FetchType.LAZY)
     @JoinColumn(name = "PRODUCT_ID")

@@ -9,10 +9,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.List;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -32,26 +35,33 @@ public class CardService {
                            Set<Integer> powers,
                            String keyword,
                            String languageCode) {
-        if (pageable == null) {
-            pageable = Pageable.ofSize(25);
-        }
+        pageable = pageable != null ? pageable : Pageable.ofSize(25);
+
         SpecificationBuilder<CardEntity> builder = new SpecificationBuilder<>();
         builder.with(CardSpecification.distinct());
-        addTypesToFilter(builder, typesId);
-        addColorsToFilter(builder, colorsId);
-        addTagsToFilter(builder, tagsId);
-        addRaritiesToFilter(builder, raritiesId);
-        addProductsToFilter(builder, productsId);
-        addCostsToFilter(builder, costs);
-        addPowersToFilter(builder, powers);
+
+        addToFilter(builder, typesId, CardSpecification::byTypeId);
+        addToFilter(builder, colorsId, CardSpecification::byColorId);
+        addToFilter(builder, tagsId, CardSpecification::byTagId);
+        addToFilter(builder, raritiesId, CardSpecification::byRarity);
+        addToFilter(builder, productsId, CardSpecification::byProductId);
+        addToFilter(builder, costs, CardSpecification::byCost);
+        addToFilter(builder, powers, CardSpecification::byPower);
         addKeywordToFilter(builder, keyword);
+
         Page<CardEntity> results = cardDao.findAll(builder.build(), pageable);
-        return new PageImpl<>(
-                results.getContent()
-                        .stream()
-                        .map(cardEntity -> new Card(cardEntity, languageCode))
-                        .collect(Collectors.toList()),
-                pageable, results.getTotalElements());
+        List<Card> cards = results.getContent()
+                .stream()
+                .map(cardEntity -> new Card(cardEntity, languageCode))
+                .collect(Collectors.toList());
+
+        return new PageImpl<>(cards, pageable, results.getTotalElements());
+    }
+
+    private <T> void addToFilter(SpecificationBuilder<CardEntity> builder, Set<T> criteria, Function<Set<T>, Specification<CardEntity>> specFunction) {
+        if (criteria != null && !criteria.isEmpty()) {
+            builder.with(specFunction.apply(criteria));
+        }
     }
 
     private void addKeywordToFilter(SpecificationBuilder<CardEntity> builder, String keyword) {
@@ -59,48 +69,4 @@ public class CardService {
             builder.with(CardSpecification.byKeyword(keyword));
         }
     }
-
-    private void addPowersToFilter(SpecificationBuilder<CardEntity> builder, Set<Integer> powers) {
-        if (powers != null && !powers.isEmpty()) {
-            builder.with(CardSpecification.byPower(powers));
-        }
-    }
-
-    private void addCostsToFilter(SpecificationBuilder<CardEntity> builder, Set<Integer> costs) {
-        if (costs != null && !costs.isEmpty()) {
-            builder.with(CardSpecification.byCost(costs));
-        }
-    }
-
-    private void addProductsToFilter(SpecificationBuilder<CardEntity> builder, Set<String> productsId) {
-        if (productsId != null && !productsId.isEmpty()) {
-            builder.with(CardSpecification.byProductId(productsId));
-        }
-    }
-
-    private void addRaritiesToFilter(SpecificationBuilder<CardEntity> builder, Set<Long> raritiesId) {
-        if (raritiesId != null && !raritiesId.isEmpty()) {
-            builder.with(CardSpecification.byRarity(raritiesId));
-        }
-    }
-
-    private void addTagsToFilter(SpecificationBuilder<CardEntity> builder, Set<Long> tagsId) {
-        if (tagsId != null && !tagsId.isEmpty()) {
-            builder.with(CardSpecification.byTagId(tagsId));
-        }
-    }
-
-    private void addColorsToFilter(SpecificationBuilder<CardEntity> builder, Set<Long> colorsId) {
-        if (colorsId != null && !colorsId.isEmpty()) {
-            builder.with(CardSpecification.byColorId(colorsId));
-        }
-    }
-
-    private void addTypesToFilter(SpecificationBuilder<CardEntity> builder,
-                                  Set<Long> typesId) {
-        if (typesId != null && !typesId.isEmpty()) {
-            builder.with(CardSpecification.byTypeId(typesId));
-        }
-    }
-
 }

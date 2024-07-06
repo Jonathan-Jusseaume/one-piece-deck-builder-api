@@ -15,3 +15,5 @@ databaseChangeLog:
             path : classpath:/db/changelog/test-data/scripts/tags.sql
         - sqlFile:
             path : classpath:/db/changelog/test-data/scripts/cards-samples.sql
+        - sqlFile:
+            path : classpath:/db/changelog/test-data/scripts/decks-samples.sql

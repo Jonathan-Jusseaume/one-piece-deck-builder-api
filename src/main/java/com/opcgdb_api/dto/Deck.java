@@ -21,29 +21,23 @@ import java.util.stream.Collectors;
 public class Deck {
 
     private UUID id;
-
     private List<Card> cards;
-
     private Card leader;
-
     private String name;
-
     private String description;
-
+    private Date creationDate;
+    private Integer countFavorites = 0;
+    private Boolean isFavorite = false;
     @JsonIgnore
     private User user;
 
-    private Date creationDate;
-
-    private Integer countFavorites = 0;
-
-    private boolean isFavorite = false;
-
-    public Deck(DeckEntity deckEntity, String languageCode, String mail) {
+    public Deck(DeckEntity deckEntity, String languageCode, String mail, boolean withCards) {
         this.id = deckEntity.getId();
-        this.cards = deckEntity.getCards().stream()
-                .map(cardEntity -> new Card(cardEntity, languageCode))
-                .collect(Collectors.toList());
+        if (withCards) {
+            this.cards = deckEntity.getCards().stream()
+                    .map(cardEntity -> new Card(cardEntity, languageCode))
+                    .collect(Collectors.toList());
+        }
         this.leader = new Card(deckEntity.getLeader(), languageCode);
         this.name = deckEntity.getName();
         this.creationDate = deckEntity.getCreationDate();

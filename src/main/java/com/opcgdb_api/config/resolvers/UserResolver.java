@@ -1,4 +1,4 @@
-package com.opcgdb_api.config;
+package com.opcgdb_api.config.resolvers;
 
 
 import com.opcgdb_api.dto.User;

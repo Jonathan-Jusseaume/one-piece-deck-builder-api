@@ -7,6 +7,7 @@ import com.opcgdb_api.entity.CardEntity;
 import com.opcgdb_api.entity.ColorEntity;
 import com.opcgdb_api.entity.DeckEntity;
 import com.opcgdb_api.entity.UserEntity;
+import com.opcgdb_api.exceptions.*;
 import com.opcgdb_api.repository.CardDao;
 import com.opcgdb_api.repository.DeckDao;
 import com.opcgdb_api.repository.UserDao;
@@ -16,12 +17,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import javax.transaction.Transactional;
-import java.security.InvalidParameterException;
 import java.sql.Date;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -31,6 +29,9 @@ import java.util.stream.Collectors;
 @Transactional
 public class DeckService {
 
+    public static final int MAX_CARDS_IN_DECK = 50;
+    public static final int MAX_COPIES_NUMBER_OF_CARD_PER_DECK = 4;
+
     private final DeckDao deckDao;
 
     private final UserDao userDao;
@@ -38,7 +39,10 @@ public class DeckService {
     private final CardDao cardDao;
 
     public Page<Deck> list(Pageable pageable, boolean onlyUserDeck, Set<Long> colorsId, String keyword, User connectedUser,
-                           boolean onlyFavorite, String language) {
+                           boolean onlyFavorite, String language) throws UserUnauthorizedException {
+        if ((onlyFavorite || onlyUserDeck) && connectedUser == null) {
+            throw new UserUnauthorizedException();
+        }
         if (pageable == null) {
             pageable = Pageable.ofSize(25);
         }
@@ -53,42 +57,42 @@ public class DeckService {
                 results.getContent()
                         .stream()
                         .map(cardEntity -> new Deck(cardEntity, language,
-                                (connectedUser != null) ? connectedUser.getMail() : null))
+                                (connectedUser != null) ? connectedUser.getMail() : null, false))
                         .collect(Collectors.toList()),
                 pageable, results.getTotalElements());
     }
 
-    public Deck read(UUID id, String language, String mail) throws ResponseStatusException {
-        return new Deck(this.readById(id), language, mail);
+    public Deck read(UUID id, String language, String mail) throws DeckNotFoundException {
+        return new Deck(this.readById(id), language, mail, true);
     }
 
-    public Deck create(Deck deck, String language) throws InvalidParameterException {
+    public Deck create(Deck deck, String language) throws DeckInvalidException {
         if (!isDeckValid(deck)) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Deck is not valid");
+            throw new DeckInvalidException();
         }
         UserEntity userToSave = this.saveUserIfNotExists(deck.getUser());
         deck.setId(UUID.randomUUID());
         deck.setUser(new User(userToSave));
         deck.setCreationDate(new Date(Calendar.getInstance().getTime().getTime()));
-        return new Deck(deckDao.save(deck.toEntity()), language, userToSave.getMail());
+        return new Deck(deckDao.save(deck.toEntity()), language, userToSave.getMail(), true);
     }
 
-    public Deck favorite(UUID id, User connectedUser, String language) throws ResponseStatusException {
+    public Deck favorite(UUID id, User connectedUser, String language) throws DeckNotFoundException, DeckAlreadyFavoritedException, DeckNotFavoritedException {
         return favoriteAction(id, connectedUser, language, true);
     }
 
-    public Deck unfavorite(UUID id, User connectedUser, String language) {
+    public Deck unfavorite(UUID id, User connectedUser, String language) throws DeckNotFoundException, DeckAlreadyFavoritedException, DeckNotFavoritedException {
         return favoriteAction(id, connectedUser, language, false);
     }
 
-    private Deck favoriteAction(UUID id, User connectedUser, String language, boolean makeFavorite) throws ResponseStatusException {
+    private Deck favoriteAction(UUID id, User connectedUser, String language, boolean makeFavorite) throws DeckNotFoundException, DeckAlreadyFavoritedException, DeckNotFavoritedException {
         DeckEntity deckEntity = this.readById(id);
         UserEntity userToSave = this.saveUserIfNotExists(connectedUser);
         if (deckEntity.isFavorite(userToSave.getMail()) && makeFavorite) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "You have already make this deck as favorite");
+            throw new DeckAlreadyFavoritedException();
         }
         if (!deckEntity.isFavorite(userToSave.getMail()) && !makeFavorite) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "You can't unfavorite a deck which is not your favorite");
+            throw new DeckNotFavoritedException();
         }
 
         if (makeFavorite) {
@@ -101,16 +105,16 @@ public class DeckService {
                     .collect(Collectors.toSet()));
             deckEntity.setCountFavorites(deckEntity.getCountFavorites() - 1);
         }
-        return new Deck(deckDao.save(deckEntity), language, userToSave.getMail());
+        return new Deck(deckDao.save(deckEntity), language, userToSave.getMail(), false);
     }
 
-    public void delete(UUID id, String mail) throws ResponseStatusException {
+    public void delete(UUID id, String mail) throws DeckOwnershipException, DeckNotFoundException {
         Optional<DeckEntity> deckEntity = deckDao.findById(id);
         if (deckEntity.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Deck with the given id doesn't exist");
+            throw new DeckNotFoundException();
         }
         if (!deckEntity.get().getUser().getMail().equals(mail)) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "This is not your deck");
+            throw new DeckOwnershipException();
         }
         this.deckDao.deleteById(id);
     }
@@ -120,10 +124,10 @@ public class DeckService {
         return optionalUserEntity.orElseGet(() -> userDao.saveAndFlush(user.toEntity()));
     }
 
-    private DeckEntity readById(UUID id) throws ResponseStatusException {
+    private DeckEntity readById(UUID id) throws DeckNotFoundException {
         Optional<DeckEntity> deckEntity = deckDao.findById(id);
         if (deckEntity.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Deck with the given id doesn't exist");
+            throw new DeckNotFoundException();
         }
         return deckEntity.get();
     }
@@ -144,7 +148,7 @@ public class DeckService {
     }
 
     private boolean validCardsNumbers(Deck deck) {
-        if (deck.getCards() == null || deck.getCards().size() != 50
+        if (deck.getCards() == null || deck.getCards().size() != MAX_CARDS_IN_DECK
                 || deck.getCards().stream().anyMatch(card -> card == null || card.getId() == null)) {
             return false;
         }
@@ -155,7 +159,7 @@ public class DeckService {
         return distinctIds.stream().noneMatch(id ->
                 deck.getCards()
                         .stream()
-                        .filter(card -> card.getId().equals(id)).count() > 4
+                        .filter(card -> card.getId().equals(id)).count() > MAX_COPIES_NUMBER_OF_CARD_PER_DECK
         );
     }
 

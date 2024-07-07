@@ -6,8 +6,9 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.opcgdb_api.dto.Card;
+import com.opcgdb_api.dto.Deck;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -23,7 +24,9 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -34,17 +37,17 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ExtendWith(SpringExtension.class)
 @AutoConfigureMockMvc
-class CardControllerTest {
+class DeckControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
 
     @ParameterizedTest
     @MethodSource("provideParametersAndExpectedResults")
-    @DisplayName("Should return filtered cards based on various parameters")
-    void shouldReturnFilteredCardsBasedOnVariousParameters(String queryParams, List<Card> expectedCards) throws Exception {
+    @DisplayName("Should return filtered decks based on various parameters")
+    void shouldReturnFilteredDecksBasedOnVariousParameters(String queryParams, List<Deck> expectedDecks) throws Exception {
 
-        MvcResult mvcResult = this.mockMvc.perform(get("/cards?" + queryParams)
+        MvcResult mvcResult = this.mockMvc.perform(get("/decks?" + queryParams)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andReturn();
@@ -53,29 +56,71 @@ class CardControllerTest {
 
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
-        TypeReference<RestResponsePage<Card>> cardPageTypeReference = new TypeReference<>() {
+        TypeReference<RestResponsePage<Deck>> deckPageTypeReference = new TypeReference<>() {
         };
-        RestResponsePage<Card> actualPage = objectMapper.readValue(jsonResponse, cardPageTypeReference);
-        List<Card> actualCards = actualPage.getContent();
+        RestResponsePage<Deck> actualPage = objectMapper.readValue(jsonResponse, deckPageTypeReference);
+        List<Deck> actualDecks = actualPage.getContent();
 
-        assertThat(actualCards
+        assertThat(actualDecks
                 .stream()
-                .map(Card::getId)
+                .map(Deck::getId)
                 .collect(Collectors.toList()))
-                .containsExactlyInAnyOrderElementsOf(expectedCards
+                .containsExactlyInAnyOrderElementsOf(expectedDecks
                         .stream()
-                        .map(Card::getId)
+                        .map(Deck::getId)
                         .collect(Collectors.toList()));
     }
 
+    @Test
+    @DisplayName("Should return 404 not found when the deck with the given ID does not exist")
+    void shouldReturn404NotFoundWhenDeckWithIDDoesNotExist() throws Exception {
+        this.mockMvc.perform(get("/decks/97e852fe-3810-4f60-a143-da10e7c8a681")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @DisplayName("Should return 401 Unauthorized when onlyFavorite is true and user is not authenticated")
+    void shouldReturn401UnauthorizedWhenOnlyFavoriteTrueAndUserNotAuthenticated() throws Exception {
+        this.mockMvc.perform(get("/decks?onlyFavorite=true")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @DisplayName("Should return 401 Unauthorized when onlyUserDeck is true and user is not authenticated")
+    void shouldReturn401UnauthorizedWhenOnlyUserDeckTrueAndUserNotAuthenticated() throws Exception {
+        this.mockMvc.perform(get("/decks?onlyUserDeck=true")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isUnauthorized());
+    }
+
+
+    @Test
+    @DisplayName("Should return deck matching the given ID")
+    void shouldReturnDeckWithTheGivenID() throws Exception {
+        String searchedDeckID = "97e852fe-3810-4f60-a143-da10e7c8a680";
+        MvcResult mvcResult = this.mockMvc.perform(get("/decks/" + searchedDeckID)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        String jsonResponse = mvcResult.getResponse().getContentAsString(StandardCharsets.UTF_8);
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+        Deck actualDeck = objectMapper.readValue(jsonResponse, Deck.class);
+
+        assertThat(actualDeck.getId()).isEqualTo(UUID.fromString(searchedDeckID));
+        assertThat(actualDeck.getCards()).hasSize(50);
+    }
+
+
     private static Stream<Arguments> provideParametersAndExpectedResults() {
         return Stream.of(
-                Arguments.of("page=0&size=10&power=6000", List.of(new Card().setId("ST01-010"), new Card().setId("ST01-012"), new Card().setId("ST02-006"), new Card().setId("ST02-009"), new Card().setId("ST02-010"))),
-                Arguments.of("page=0&size=10&typeId=0&colorId=0", List.of(new Card().setId("ST01-001"))),
-                Arguments.of("page=0&size=10&tagId=1&productId=ST-01", List.of(new Card().setId("ST01-001"), new Card().setId("ST01-012"), new Card().setId("ST01-013"))),
-                Arguments.of("page=0&size=10&rarityId=3", List.of(new Card().setId("ST01-012"), new Card().setId("ST01-013"), new Card().setId("ST02-009"), new Card().setId("ST02-013"))),
-                Arguments.of("page=0&size=10&keyword=Counter", List.of(new Card().setId("ST01-014"), new Card().setId("ST02-015"), new Card().setId("ST02-016"))),
-                Arguments.of("page=0&size=10&keyword=rush !luffy", List.of(new Card().setId("ST01-004")))
+                Arguments.of("page=0&size=10", List.of(new Deck().setId(UUID.fromString("97e852fe-3810-4f60-a143-da10e7c8a760")),
+                        new Deck().setId(UUID.fromString("97e852fe-3810-4f60-a143-da10e7c8a680")))),
+                Arguments.of("page=0&size=10&keyword=luffy !starter", Collections.emptyList())
         );
     }
 
@@ -96,5 +141,4 @@ class CardControllerTest {
         }
 
     }
-
 }

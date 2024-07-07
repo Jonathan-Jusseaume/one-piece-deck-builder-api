@@ -1,4 +1,4 @@
-package com.opcgdb_api.config;
+package com.opcgdb_api.config.web;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
@@ -13,7 +13,7 @@ import java.util.concurrent.TimeUnit;
 
 @Configuration
 @EnableSpringDataWebSupport
-public class WebConfig extends WebMvcConfigurationSupport {
+public class WebSupportConfiguration extends WebMvcConfigurationSupport {
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
@@ -26,4 +26,5 @@ public class WebConfig extends WebMvcConfigurationSupport {
     public void addArgumentResolvers(List<HandlerMethodArgumentResolver> argumentResolvers) {
         argumentResolvers.add(new PageableHandlerMethodArgumentResolver());
     }
+
 }

@@ -37,13 +37,6 @@ public class CardEntity {
     )
     private Set<ColorEntity> colors;
 
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(name = "UT_CARD_DECK",
-            joinColumns = @JoinColumn(name = "CARD_ID"),
-            inverseJoinColumns = @JoinColumn(name = "DECK_ID")
-    )
-    private Set<DeckEntity> decks;
-
     @ManyToMany
     @JoinTable(name = "UT_CARD_TAG",
             joinColumns = @JoinColumn(name = "CARD_ID"),

@@ -1,6 +1,6 @@
 package com.opcgdb_api.controller;
 
-import com.opcgdb_api.config.LanguageResolver;
+import com.opcgdb_api.config.resolvers.LanguageResolver;
 import com.opcgdb_api.dto.Tag;
 import com.opcgdb_api.service.TagService;
 import io.swagger.v3.oas.annotations.Operation;

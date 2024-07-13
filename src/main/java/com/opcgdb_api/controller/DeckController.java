@@ -1,7 +1,6 @@
 package com.opcgdb_api.controller;
 
 import com.opcgdb_api.config.resolvers.LanguageResolver;
-import com.opcgdb_api.config.resolvers.UserResolver;
 import com.opcgdb_api.dto.Deck;
 import com.opcgdb_api.dto.User;
 import com.opcgdb_api.exceptions.*;
@@ -14,6 +13,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.data.web.SortDefault;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -25,8 +25,6 @@ import java.util.UUID;
 @RequestMapping("/decks")
 @RequiredArgsConstructor
 public class DeckController {
-
-    private final UserResolver userResolver;
 
     private final LanguageResolver languageResolver;
 
@@ -57,7 +55,7 @@ public class DeckController {
                     description = "If the boolean value is true, it will return only the deck created by the user connected")
             Boolean onlyUserDeck,
             HttpServletRequest request) throws UserUnauthorizedException {
-        User connectedUser = userResolver.resolveUserFromRequest(request);
+        User connectedUser = getConnectedUser();
         return deckService.list(
                 pageable, onlyUserDeck, colorsId, keyword, connectedUser, onlyFavorite,
                 languageResolver.resolveLocale(request).getLanguage()
@@ -70,15 +68,17 @@ public class DeckController {
             @Parameter(description = "ID of the deck")
             @PathVariable UUID id,
             HttpServletRequest request) throws DeckNotFoundException {
+        User connectedUser = getConnectedUser();
         return deckService.read(id, languageResolver.resolveLocale(request).getLanguage(),
-                this.getMailIfUserConnected(request));
+                connectedUser != null ? connectedUser.getMail() : "");
     }
 
 
     @Operation(summary = "Create a deck for the User Authenticated")
     @PostMapping
     public Deck create(@RequestBody Deck deck, HttpServletRequest request) throws DeckInvalidException, UserUnauthorizedException {
-        User connectedUser = getConnectedUser(request);
+        User connectedUser = getConnectedUser();
+        this.assertUserIsConnected(connectedUser);
         deck.setUser(connectedUser);
         return deckService.create(deck, languageResolver.resolveLocale(request).getLanguage());
     }
@@ -88,7 +88,8 @@ public class DeckController {
     @PostMapping("{id}/favorite")
     public Deck favorite(@Parameter(description = "ID of the deck")
                          @PathVariable UUID id, HttpServletRequest request) throws DeckNotFoundException, UserUnauthorizedException, DeckAlreadyFavoritedException, DeckNotFavoritedException {
-        User connectedUser = getConnectedUser(request);
+        User connectedUser = getConnectedUser();
+        this.assertUserIsConnected(connectedUser);
         return deckService.favorite(id, connectedUser, languageResolver.resolveLocale(request).getLanguage());
     }
 
@@ -96,7 +97,8 @@ public class DeckController {
     @PostMapping("{id}/unfavorite")
     public Deck unfavorite(@Parameter(description = "ID of the deck")
                            @PathVariable UUID id, HttpServletRequest request) throws DeckNotFoundException, UserUnauthorizedException, DeckAlreadyFavoritedException, DeckNotFavoritedException {
-        User connectedUser = getConnectedUser(request);
+        User connectedUser = getConnectedUser();
+        this.assertUserIsConnected(connectedUser);
         return deckService.unfavorite(id, connectedUser, languageResolver.resolveLocale(request).getLanguage());
     }
 
@@ -104,28 +106,24 @@ public class DeckController {
     @DeleteMapping("{id}")
     public void delete(
             @Parameter(description = "ID of the deck")
-            @PathVariable UUID id,
-            HttpServletRequest request) throws DeckOwnershipException, DeckNotFoundException, UserUnauthorizedException {
-        User connectedUser = getConnectedUser(request);
+            @PathVariable UUID id) throws DeckOwnershipException, DeckNotFoundException, UserUnauthorizedException {
+        User connectedUser = getConnectedUser();
+        this.assertUserIsConnected(connectedUser);
         deckService.delete(id, connectedUser.getMail());
     }
 
-    private User getConnectedUser(HttpServletRequest request) throws UserUnauthorizedException {
-        User connectedUser = userResolver.resolveUserFromRequest(request);
-        if (connectedUser == null || connectedUser.getMail() == null
-                || connectedUser.getMail().isEmpty()) {
-            throw new UserUnauthorizedException();
+    private User getConnectedUser() {
+        String connectedMail = SecurityContextHolder.getContext().getAuthentication().getName();
+        if (connectedMail.equals("anonymousUser")) {
+            return null;
         }
-        return connectedUser;
+        return new User().setMail(connectedMail);
     }
 
-    private String getMailIfUserConnected(HttpServletRequest request) {
-        User connectedUser = userResolver.resolveUserFromRequest(request);
-        String mail = null;
-        if (connectedUser != null && connectedUser.getMail() != null) {
-            mail = connectedUser.getMail();
+    private void assertUserIsConnected(User connectedUser) throws UserUnauthorizedException {
+        if (connectedUser == null) {
+            throw new UserUnauthorizedException();
         }
-        return mail;
     }
 
 }

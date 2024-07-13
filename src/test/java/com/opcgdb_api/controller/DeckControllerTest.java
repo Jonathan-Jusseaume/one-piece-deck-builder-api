@@ -19,10 +19,13 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
+import javax.transaction.Transactional;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.List;
@@ -31,6 +34,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -80,7 +84,7 @@ class DeckControllerTest {
     }
 
     @Test
-    @DisplayName("Should return 401 Unauthorized when onlyFavorite is true and user is not authenticated")
+    @DisplayName("Should return 401 unauthorized when onlyFavorite is true and user is not authenticated")
     void shouldReturn401UnauthorizedWhenOnlyFavoriteTrueAndUserNotAuthenticated() throws Exception {
         this.mockMvc.perform(get("/decks?onlyFavorite=true")
                         .accept(MediaType.APPLICATION_JSON))
@@ -88,7 +92,7 @@ class DeckControllerTest {
     }
 
     @Test
-    @DisplayName("Should return 401 Unauthorized when onlyUserDeck is true and user is not authenticated")
+    @DisplayName("Should return 401 unauthorized when onlyUserDeck is true and user is not authenticated")
     void shouldReturn401UnauthorizedWhenOnlyUserDeckTrueAndUserNotAuthenticated() throws Exception {
         this.mockMvc.perform(get("/decks?onlyUserDeck=true")
                         .accept(MediaType.APPLICATION_JSON))
@@ -97,8 +101,8 @@ class DeckControllerTest {
 
 
     @Test
-    @DisplayName("Should return deck matching the given ID")
-    void shouldReturnDeckWithTheGivenID() throws Exception {
+    @DisplayName("Get should return deck matching the given ID")
+    void get_shouldReturnDeckWithTheGivenID_whenIDExist() throws Exception {
         String searchedDeckID = "97e852fe-3810-4f60-a143-da10e7c8a680";
         MvcResult mvcResult = this.mockMvc.perform(get("/decks/" + searchedDeckID)
                         .accept(MediaType.APPLICATION_JSON))
@@ -115,6 +119,38 @@ class DeckControllerTest {
         assertThat(actualDeck.getCards()).hasSize(50);
     }
 
+    @Test
+    @WithMockUser(username = "toto")
+    @DisplayName("Delete should return 404 not found when the deck with the given ID does not exist")
+    void delete_shouldReturn404NotFound_whenDeckWithIDDoesNotExist() throws Exception {
+        this.mockMvc.perform(delete("/decks/97e852fe-3810-4f60-a143-da10e7c8a681")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @WithMockUser(username = "toto")
+    @DisplayName("Delete should return 403 forbidden when the deck with the given ID does not belong to the user")
+    void delete_shouldReturn403Forbidden_whenDeckWithIDDoesNotBelongToUser() throws Exception {
+        this.mockMvc.perform(delete("/decks/97e852fe-3810-4f60-a143-da10e7c8a680")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @WithMockUser(username = "second-test-user@test.com")
+    @DisplayName("Delete should return success when the deck with the given ID belongs to the user")
+    @Transactional
+    @Rollback
+    void delete_shouldReturnSuccess_whenDeckWithIDBelongsToUser() throws Exception {
+        this.mockMvc.perform(delete("/decks/97e852fe-3810-4f60-a143-da10e7c8a680")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+        this.mockMvc.perform(get("/decks/97e852fe-3810-4f60-a143-da10e7c8a680")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
+    }
 
     private static Stream<Arguments> provideParametersAndExpectedResults() {
         return Stream.of(

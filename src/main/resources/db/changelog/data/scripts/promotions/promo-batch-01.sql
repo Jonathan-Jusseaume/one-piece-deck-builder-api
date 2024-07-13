@@ -1,0 +1,38 @@
+/**
+  @author: JUSSEAUME Jonathan
+  Database Script promo-batch-01.sql
+  Add information about ONE PIECE CARD GAME Promotion Pack 2022
+ */
+
+INSERT INTO UT_PRODUCT(ID, RELEASE_DATE)
+VALUES ('PROMOTION-2022', '01/12/2022')
+ON CONFLICT DO NOTHING;
+
+INSERT INTO UT_PRODUCT_DESCRIPTION (PRODUCT_ID, LANGUAGE_CODE, NAME)
+VALUES ('PROMOTION-2022', 'en', 'ONE PIECE CARD GAME Promotion Pack 2022'),
+       ('PROMOTION-2022', 'fr', 'ONE PIECE CARD GAME Promotion Pack 2022')
+ON CONFLICT DO NOTHING;
+
+INSERT INTO UT_CARD (ID, TYPE_ID, ATTRIBUTE_ID, COST, POWER, LIFE, COUNTER)
+VALUES ('P-001', 1, 0, 6, 7000, NULL, NULL)
+ON CONFLICT DO NOTHING;
+
+INSERT INTO UT_CARD_IMAGE (CARD_ID, NAME, RARITY_ID, PRODUCT_ID)
+VALUES ('P-001', 'P-001.png', 7, 'PROMOTION-2022')
+ON CONFLICT DO NOTHING;
+
+INSERT INTO UT_CARD_COLOR (COLOR_ID, CARD_ID)
+VALUES (0, 'P-001')
+ON CONFLICT DO NOTHING;
+
+INSERT INTO UT_CARD_TAG (TAG_ID, CARD_ID)
+VALUES (1, 'P-001'),
+       (0, 'P-001')
+ON CONFLICT DO NOTHING;
+
+INSERT INTO UT_CARD_DESCRIPTION (CARD_ID, LANGUAGE_CODE, NAME, EFFECT)
+VALUES ('P-001', 'en', 'Monkey.D.Luffy',
+        '[DON!! x2] This Character gains [Rush]. \n (This card can attack on the turn in which it is played.)'),
+       ('P-001', 'fr', 'Monkey.D.Luffy',
+        '[DON!! x2] This Character gains [Rush]. \n (This card can attack on the turn in which it is played.)')
+ON CONFLICT DO NOTHING;

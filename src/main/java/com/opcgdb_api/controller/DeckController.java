@@ -76,40 +76,31 @@ public class DeckController {
 
     @Operation(summary = "Create a deck for the User Authenticated")
     @PostMapping
-    public Deck create(@RequestBody Deck deck, HttpServletRequest request) throws DeckInvalidException, UserUnauthorizedException {
-        User connectedUser = getConnectedUser();
-        this.assertUserIsConnected(connectedUser);
-        deck.setUser(connectedUser);
-        return deckService.create(deck, languageResolver.resolveLocale(request).getLanguage());
+    public Deck create(@RequestBody Deck deck, HttpServletRequest request) throws DeckInvalidException {
+        return deckService.create(deck.setUser(getConnectedUser()), languageResolver.resolveLocale(request).getLanguage());
     }
 
 
     @Operation(summary = "Make a deck as favorite for the User Authenticated")
     @PostMapping("{id}/favorite")
     public Deck favorite(@Parameter(description = "ID of the deck")
-                         @PathVariable UUID id, HttpServletRequest request) throws DeckNotFoundException, UserUnauthorizedException, DeckAlreadyFavoritedException, DeckNotFavoritedException {
-        User connectedUser = getConnectedUser();
-        this.assertUserIsConnected(connectedUser);
-        return deckService.favorite(id, connectedUser, languageResolver.resolveLocale(request).getLanguage());
+                         @PathVariable UUID id, HttpServletRequest request) throws DeckNotFoundException, DeckAlreadyFavoritedException, DeckNotFavoritedException {
+        return deckService.favorite(id, getConnectedUser(), languageResolver.resolveLocale(request).getLanguage());
     }
 
     @Operation(summary = "Unfavorite a deck for the User Authenticated")
     @PostMapping("{id}/unfavorite")
     public Deck unfavorite(@Parameter(description = "ID of the deck")
-                           @PathVariable UUID id, HttpServletRequest request) throws DeckNotFoundException, UserUnauthorizedException, DeckAlreadyFavoritedException, DeckNotFavoritedException {
-        User connectedUser = getConnectedUser();
-        this.assertUserIsConnected(connectedUser);
-        return deckService.unfavorite(id, connectedUser, languageResolver.resolveLocale(request).getLanguage());
+                           @PathVariable UUID id, HttpServletRequest request) throws DeckNotFoundException, DeckAlreadyFavoritedException, DeckNotFavoritedException {
+        return deckService.unfavorite(id, getConnectedUser(), languageResolver.resolveLocale(request).getLanguage());
     }
 
     @Operation(summary = "Delete the deck with the id in the path. You need to be the owner of the deck")
     @DeleteMapping("{id}")
     public void delete(
             @Parameter(description = "ID of the deck")
-            @PathVariable UUID id) throws DeckOwnershipException, DeckNotFoundException, UserUnauthorizedException {
-        User connectedUser = getConnectedUser();
-        this.assertUserIsConnected(connectedUser);
-        deckService.delete(id, connectedUser.getMail());
+            @PathVariable UUID id) throws DeckOwnershipException, DeckNotFoundException {
+        deckService.delete(id, getConnectedUser());
     }
 
     private User getConnectedUser() {
@@ -118,12 +109,6 @@ public class DeckController {
             return null;
         }
         return new User().setMail(connectedMail);
-    }
-
-    private void assertUserIsConnected(User connectedUser) throws UserUnauthorizedException {
-        if (connectedUser == null) {
-            throw new UserUnauthorizedException();
-        }
     }
 
 }

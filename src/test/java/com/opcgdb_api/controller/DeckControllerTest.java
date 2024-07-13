@@ -49,7 +49,7 @@ class DeckControllerTest {
 
     @ParameterizedTest
     @MethodSource("provideParametersAndExpectedResults")
-    @DisplayName("Should return filtered decks based on various parameters")
+    @DisplayName("List should return filtered decks based on various parameters")
     void list_shouldReturnFilteredDecksMatchingParameters(String queryParams, List<Deck> expectedDecks) throws Exception {
 
         MvcResult mvcResult = this.mockMvc.perform(get("/decks?" + queryParams)
@@ -77,7 +77,57 @@ class DeckControllerTest {
     }
 
     @Test
-    @DisplayName("Should return 401 unauthorized when onlyFavorite is true and user is not authenticated")
+    @WithMockUser(username = "test-user@test.com")
+    @DisplayName("List should return filtered decks of user when onlyUserDeck is true")
+    void list_shouldReturnDecksOfUser_whenOnlyUserDeckIsTrue() throws Exception {
+        MvcResult mvcResult = this.mockMvc.perform(get("/decks?onlyUserDeck=true")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        String jsonResponse = mvcResult.getResponse().getContentAsString(StandardCharsets.UTF_8);
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+        TypeReference<RestResponsePage<Deck>> deckPageTypeReference = new TypeReference<>() {
+        };
+        RestResponsePage<Deck> actualPage = objectMapper.readValue(jsonResponse, deckPageTypeReference);
+        List<Deck> actualDecks = actualPage.getContent();
+
+        assertThat(actualDecks
+                .stream()
+                .map(Deck::getId)
+                .collect(Collectors.toList()))
+                .containsExactlyInAnyOrderElementsOf(List.of(UUID.fromString("97e852fe-3810-4f60-a143-da10e7c8a760")));
+    }
+
+    @Test
+    @WithMockUser(username = "test-user@test.com")
+    @DisplayName("List should return filtered decks of user's favorite when onlyFavorite is true")
+    void list_shouldReturnDecksOfUserSFavorite_whenOnlyFavoriteIsTrue() throws Exception {
+        MvcResult mvcResult = this.mockMvc.perform(get("/decks?onlyFavorite=true")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        String jsonResponse = mvcResult.getResponse().getContentAsString(StandardCharsets.UTF_8);
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+        TypeReference<RestResponsePage<Deck>> deckPageTypeReference = new TypeReference<>() {
+        };
+        RestResponsePage<Deck> actualPage = objectMapper.readValue(jsonResponse, deckPageTypeReference);
+        List<Deck> actualDecks = actualPage.getContent();
+
+        assertThat(actualDecks
+                .stream()
+                .map(Deck::getId)
+                .collect(Collectors.toList()))
+                .containsExactlyInAnyOrderElementsOf(List.of(UUID.fromString("97e852fe-3810-4f60-a143-da10e7c8a680")));
+    }
+
+    @Test
+    @DisplayName("List should return 401 unauthorized when onlyFavorite is true and user is not authenticated")
     void list_shouldReturn401Unauthorized_whenOnlyFavoriteTrueAndUserNotAuthenticated() throws Exception {
         this.mockMvc.perform(get("/decks?onlyFavorite=true")
                         .accept(MediaType.APPLICATION_JSON))
@@ -85,7 +135,7 @@ class DeckControllerTest {
     }
 
     @Test
-    @DisplayName("Should return 401 unauthorized when onlyUserDeck is true and user is not authenticated")
+    @DisplayName("List should return 401 unauthorized when onlyUserDeck is true and user is not authenticated")
     void list_shouldReturn401Unauthorized_whenOnlyUserDeckTrueAndUserNotAuthenticated() throws Exception {
         this.mockMvc.perform(get("/decks?onlyUserDeck=true")
                         .accept(MediaType.APPLICATION_JSON))
@@ -93,7 +143,7 @@ class DeckControllerTest {
     }
 
     @Test
-    @DisplayName("Should return 404 not found when the deck with the given ID does not exist")
+    @DisplayName("Read should return 404 not found when the deck with the given ID does not exist")
     void read_shouldReturn404NotFound_whenDeckWithIDDoesNotExist() throws Exception {
         this.mockMvc.perform(get("/decks/97e852fe-3810-4f60-a143-da10e7c8a681")
                         .accept(MediaType.APPLICATION_JSON))
@@ -101,7 +151,7 @@ class DeckControllerTest {
     }
 
     @Test
-    @DisplayName("Get should return deck matching the given ID")
+    @DisplayName("Read should return deck matching the given ID")
     void read_shouldReturnDeckWithTheGivenID_whenIDExist() throws Exception {
         String searchedDeckID = "97e852fe-3810-4f60-a143-da10e7c8a680";
         MvcResult mvcResult = this.mockMvc.perform(get("/decks/" + searchedDeckID)
@@ -137,6 +187,53 @@ class DeckControllerTest {
 
     @Test
     @WithMockUser(username = "test-user")
+    @DisplayName("Create should return precondition failed when the leader is not filled")
+    void create_shouldReturnPreconditionFailed_whenLeaderIsNotFilled() throws Exception {
+        Deck invalidDeck = new Deck()
+                .setName("Test Deck")
+                .setCards(sampleCardList());
+
+        this.mockMvc.perform(post("/decks")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(new ObjectMapper().writeValueAsString(invalidDeck))
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isPreconditionFailed());
+    }
+
+    @Test
+    @WithMockUser(username = "test-user")
+    @DisplayName("Create should return precondition failed when the leader does not exist")
+    void create_shouldReturnPreconditionFailed_whenLeaderDoesNotExist() throws Exception {
+        Deck invalidDeck = new Deck()
+                .setName("Test Deck")
+                .setLeader(new Card().setId("ST-TEST"))
+                .setCards(sampleCardList());
+
+        this.mockMvc.perform(post("/decks")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(new ObjectMapper().writeValueAsString(invalidDeck))
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isPreconditionFailed());
+    }
+
+    @Test
+    @WithMockUser(username = "test-user")
+    @DisplayName("Create should return precondition failed when cards are not of the color of the leader")
+    void create_shouldReturnPreconditionFailed_whenCardsAreNotOfTheColorOfTheLeader() throws Exception {
+        Deck invalidDeck = new Deck()
+                .setName("Test Deck")
+                .setLeader(new Card().setId("ST01-001"))
+                .setCards(sampleCardList());
+
+        this.mockMvc.perform(post("/decks")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(new ObjectMapper().writeValueAsString(invalidDeck))
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isPreconditionFailed());
+    }
+
+    @Test
+    @WithMockUser(username = "test-user")
     @DisplayName("Create should return success when the deck is valid")
     @Transactional
     @Rollback
@@ -156,6 +253,7 @@ class DeckControllerTest {
         objectMapper.registerModule(new JavaTimeModule());
         Deck createdDeck = objectMapper.readValue(jsonResponse, Deck.class);
         assertThat(createdDeck.getName()).isEqualTo(validDeck.getName());
+        assertThat(createdDeck.getCountFavorites()).isZero();
     }
 
     @Test
@@ -191,6 +289,76 @@ class DeckControllerTest {
                 .andExpect(status().isNotFound());
     }
 
+    @Test
+    @WithMockUser(username = "test-user@test.com")
+    @DisplayName("Favorite should return conflict when the deck with the given ID is already a favorite deck of the user")
+    void favorite_shouldReturnConflict_whenDeckIsAlreadyFavoriteOfUser() throws Exception {
+        this.mockMvc.perform(post("/decks/97e852fe-3810-4f60-a143-da10e7c8a680/favorite")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isConflict());
+    }
+
+    @Test
+    @WithMockUser(username = "test-user@test.com")
+    @DisplayName("Favorite should return success when the deck is not already a favorite deck of the user")
+    @Transactional
+    @Rollback
+    void favorite_shouldReturnSuccess_whenDeckIsANewFavoriteDeckOfUser() throws Exception {
+        String favoriteDeckID = "97e852fe-3810-4f60-a143-da10e7c8a760";
+
+        this.mockMvc.perform(post("/decks/" + favoriteDeckID + "/favorite")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+        MvcResult mvcResult = this.mockMvc.perform(get("/decks/" + favoriteDeckID)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        String jsonResponse = mvcResult.getResponse().getContentAsString(StandardCharsets.UTF_8);
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+        Deck actualDeck = objectMapper.readValue(jsonResponse, Deck.class);
+
+        assertThat(actualDeck.getCountFavorites()).isEqualTo(1);
+    }
+
+    @Test
+    @WithMockUser(username = "test-user@test.com")
+    @DisplayName("Unfavorite should return conflict when the deck with the given ID is not a favorite deck of the user")
+    void unfavorite_shouldReturnConflict_whenDeckIsNotFavoriteOfUser() throws Exception {
+        this.mockMvc.perform(post("/decks/97e852fe-3810-4f60-a143-da10e7c8a760/unfavorite")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isConflict());
+    }
+
+    @Test
+    @WithMockUser(username = "test-user@test.com")
+    @DisplayName("Unfavorite should return success when the deck is a favorite deck of the user")
+    @Transactional
+    @Rollback
+    void unfavorite_shouldReturnSuccess_whenDeckIsAFavoriteDeckOfUser() throws Exception {
+        String unfavoriteDeckID = "97e852fe-3810-4f60-a143-da10e7c8a680";
+
+        this.mockMvc.perform(post("/decks/" + unfavoriteDeckID + "/unfavorite")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+        MvcResult mvcResult = this.mockMvc.perform(get("/decks/" + unfavoriteDeckID)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        String jsonResponse = mvcResult.getResponse().getContentAsString(StandardCharsets.UTF_8);
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+        Deck actualDeck = objectMapper.readValue(jsonResponse, Deck.class);
+
+        assertThat(actualDeck.getCountFavorites()).isZero();
+    }
+
     private static Stream<Arguments> provideParametersAndExpectedResults() {
         return Stream.of(
                 Arguments.of("page=0&size=10", List.of(new Deck().setId(UUID.fromString("97e852fe-3810-4f60-a143-da10e7c8a760")),
@@ -200,6 +368,14 @@ class DeckControllerTest {
     }
 
     private static Deck createValidDeck() {
+        return new Deck()
+                .setLeader(new Card().setId("ST02-001"))
+                .setName("KID STARTER")
+                .setDescription("Example of a deck. This is the second starter")
+                .setCards(sampleCardList());
+    }
+
+    private static List<Card> sampleCardList() {
         List<Card> cards = new ArrayList<>();
         for (int i = 0; i < 4; i++) cards.add(new Card().setId("ST02-006"));
         for (int i = 0; i < 4; i++) cards.add(new Card().setId("ST02-007"));
@@ -215,16 +391,8 @@ class DeckControllerTest {
         for (int i = 0; i < 2; i++) cards.add(new Card().setId("ST02-012"));
         for (int i = 0; i < 2; i++) cards.add(new Card().setId("ST02-014"));
         for (int i = 0; i < 2; i++) cards.add(new Card().setId("ST02-016"));
-        Card leader = new Card().setId("ST02-001");
-        return new Deck()
-                .setId(UUID.fromString("97e852fe-3810-4f60-a143-da10e7c8a680"))
-                .setLeader(leader)
-                .setName("KID STARTER")
-                .setDescription("Example of a deck. This is the second starter")
-                .setCountFavorites(0)
-                .setCards(cards);
+        return cards;
     }
-
 
     public static class RestResponsePage<T> extends PageImpl<T> {
         @JsonCreator

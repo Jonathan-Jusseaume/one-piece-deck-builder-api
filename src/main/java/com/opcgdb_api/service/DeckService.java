@@ -108,12 +108,12 @@ public class DeckService {
         return new Deck(deckDao.save(deckEntity), language, userToSave.getMail(), false);
     }
 
-    public void delete(UUID id, String mail) throws DeckOwnershipException, DeckNotFoundException {
+    public void delete(UUID id, User user) throws DeckOwnershipException, DeckNotFoundException {
         Optional<DeckEntity> deckEntity = deckDao.findById(id);
         if (deckEntity.isEmpty()) {
             throw new DeckNotFoundException();
         }
-        if (!deckEntity.get().getUser().getMail().equals(mail)) {
+        if (!deckEntity.get().getUser().getMail().equals(user.getMail())) {
             throw new DeckOwnershipException();
         }
         this.deckDao.deleteById(id);

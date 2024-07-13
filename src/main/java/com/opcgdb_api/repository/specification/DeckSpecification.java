@@ -4,6 +4,7 @@ import com.opcgdb_api.entity.CardEntity;
 import com.opcgdb_api.entity.ColorEntity;
 import com.opcgdb_api.entity.DeckEntity;
 import com.opcgdb_api.entity.UserEntity;
+import lombok.experimental.UtilityClass;
 import org.springframework.data.jpa.domain.Specification;
 
 import javax.persistence.criteria.Join;
@@ -11,11 +12,8 @@ import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.SetJoin;
 import java.util.Set;
 
+@UtilityClass
 public class DeckSpecification {
-
-    private DeckSpecification() throws InstantiationException {
-        throw new InstantiationException("Can't instantiate DeckSpecification");
-    }
 
     public static Specification<DeckEntity> distinct() {
         return (root, query, cb) -> {

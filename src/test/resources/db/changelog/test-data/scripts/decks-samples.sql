@@ -61,7 +61,7 @@ VALUES ('97e852fe-3810-4f60-a143-da10e7c8a760', 'ST01-006'),
 
 INSERT INTO UT_DECK (ID, USER_MAIL, LEADER_ID, NAME, CREATION_DATE, DESCRIPTION, COUNT_FAVORITES)
 VALUES ('97e852fe-3810-4f60-a143-da10e7c8a680', 'second-test-user@test.com', 'ST02-001', 'KID STARTER', '2022-11-12',
-        'Example of a deck. This is the second starter', 0);
+        'Example of a deck. This is the second starter', 1);
 
 INSERT INTO UT_DECK_CARD (DECK_ID, CARD_ID)
 VALUES ('97e852fe-3810-4f60-a143-da10e7c8a680', 'ST02-006'),
@@ -114,3 +114,7 @@ VALUES ('97e852fe-3810-4f60-a143-da10e7c8a680', 'ST02-006'),
        ('97e852fe-3810-4f60-a143-da10e7c8a680', 'ST02-015'),
        ('97e852fe-3810-4f60-a143-da10e7c8a680', 'ST02-017'),
        ('97e852fe-3810-4f60-a143-da10e7c8a680', 'ST02-017');
+
+
+INSERT INTO UT_DECK_FAVORITE(DECK_ID, USER_MAIL)
+VALUES ('97e852fe-3810-4f60-a143-da10e7c8a680', 'test-user@test.com')

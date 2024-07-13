@@ -27,7 +27,7 @@ public class Deck {
     private String description;
     private Date creationDate;
     private Integer countFavorites = 0;
-    private Boolean isFavorite = false;
+    private Boolean favorite = false;
     @JsonIgnore
     private User user;
 
@@ -43,7 +43,7 @@ public class Deck {
         this.creationDate = deckEntity.getCreationDate();
         this.description = deckEntity.getDescription();
         this.countFavorites = deckEntity.getCountFavorites();
-        this.isFavorite = deckEntity.isFavorite(mail);
+        this.favorite = deckEntity.isFavorite(mail);
     }
 
     public DeckEntity toEntity() {

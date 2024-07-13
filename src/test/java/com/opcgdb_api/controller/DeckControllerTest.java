@@ -124,6 +124,8 @@ class DeckControllerTest {
                 .map(Deck::getId)
                 .collect(Collectors.toList()))
                 .containsExactlyInAnyOrderElementsOf(List.of(UUID.fromString("97e852fe-3810-4f60-a143-da10e7c8a680")));
+
+        assertThat(actualDecks.stream().map(Deck::getFavorite)).allMatch(expected -> expected.equals(Boolean.TRUE));
     }
 
     @Test

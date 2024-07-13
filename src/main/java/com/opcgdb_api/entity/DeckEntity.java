@@ -5,7 +5,7 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import javax.persistence.*;
-import java.sql.Date;
+import java.time.Instant;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -47,7 +47,7 @@ public class DeckEntity {
     private String name;
 
     @Column(name = "CREATION_DATE")
-    private Date creationDate;
+    private Instant creationDate;
 
     @Column(name = "DESCRIPTION")
     private String description;

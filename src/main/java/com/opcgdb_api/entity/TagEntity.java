@@ -7,7 +7,7 @@ import java.util.Set;
 
 @Getter
 @Entity
-@Table(name = "UT_TAG")
+@Table(name = "UT_TAG", schema = "public")
 public class TagEntity {
 
     @Id

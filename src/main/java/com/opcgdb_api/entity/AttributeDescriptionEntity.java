@@ -6,7 +6,6 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import javax.persistence.*;
-import java.io.Serializable;
 
 @Getter
 @Setter
@@ -14,7 +13,7 @@ import java.io.Serializable;
 @Entity
 @Table(name = "UT_ATTRIBUTE_DESCRIPTION", schema = "public")
 @IdClass(AttributeDescriptionKey.class)
-public class AttributeDescriptionEntity implements Serializable {
+public class AttributeDescriptionEntity {
 
     @Id
     @Column(name = "ATTRIBUTE_ID", nullable = false)

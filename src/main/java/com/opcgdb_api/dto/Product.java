@@ -2,10 +2,7 @@ package com.opcgdb_api.dto;
 
 import com.opcgdb_api.entity.ProductDescriptionEntity;
 import com.opcgdb_api.entity.ProductEntity;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import lombok.experimental.Accessors;
 
 import java.time.Instant;
@@ -15,6 +12,7 @@ import java.time.Instant;
 @Accessors(chain = true)
 @NoArgsConstructor
 @EqualsAndHashCode
+@ToString
 public class Product {
 
     private String id;

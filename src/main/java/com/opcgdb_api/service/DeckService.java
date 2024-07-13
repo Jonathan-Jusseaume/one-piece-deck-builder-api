@@ -20,8 +20,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.sql.Date;
-import java.util.*;
+import java.time.Instant;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -73,7 +76,7 @@ public class DeckService {
         UserEntity userToSave = this.saveUserIfNotExists(deck.getUser());
         deck.setId(UUID.randomUUID());
         deck.setUser(new User(userToSave));
-        deck.setCreationDate(new Date(Calendar.getInstance().getTime().getTime()));
+        deck.setCreationDate(Instant.now());
         return new Deck(deckDao.save(deck.toEntity()), language, userToSave.getMail(), true);
     }
 

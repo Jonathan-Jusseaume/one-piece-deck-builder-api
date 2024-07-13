@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
-import java.sql.Date;
+import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
@@ -21,13 +21,21 @@ import java.util.stream.Collectors;
 public class Deck {
 
     private UUID id;
+
     private List<Card> cards;
+
     private Card leader;
+
     private String name;
+
     private String description;
-    private Date creationDate;
+
+    private Instant creationDate;
+
     private Integer countFavorites = 0;
+
     private Boolean favorite = false;
+
     @JsonIgnore
     private User user;
 

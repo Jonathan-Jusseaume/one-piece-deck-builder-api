@@ -1033,6 +1033,4 @@ VALUES ('OP02-001', 'en', 'Edward.Newgate',
         '[Your Turn] Give all of your opponent''s Characters −5 cost. \n [On Play] K.O. up to 1 of your opponent''s Characters with a cost of 0.')
 ON CONFLICT DO NOTHING;
 
-UPDATE UT_CARD SET STATUS_ID=2 WHERE ID IN ('OP02-024', 'OP02-052');
-
 

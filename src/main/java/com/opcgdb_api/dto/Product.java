@@ -1,11 +1,13 @@
 package com.opcgdb_api.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.opcgdb_api.entity.ProductDescriptionEntity;
 import com.opcgdb_api.entity.ProductEntity;
 import lombok.*;
 import lombok.experimental.Accessors;
 
-import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneOffset;
 
 @Getter
 @Setter
@@ -17,13 +19,14 @@ public class Product {
 
     private String id;
 
-    private Instant releaseDate;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "UTC")
+    private LocalDate releaseDate;
 
     private String label;
 
     public Product(ProductEntity productEntity, String languageCode) {
         this.id = productEntity.getId();
-        this.releaseDate = productEntity.getReleaseDate();
+        this.releaseDate = LocalDate.ofInstant(productEntity.getReleaseDate(), ZoneOffset.UTC);
         for (ProductDescriptionEntity description : productEntity.getDescriptions()) {
             if (description.getLanguageCode().equals(languageCode)) {
                 this.label = description.getName();

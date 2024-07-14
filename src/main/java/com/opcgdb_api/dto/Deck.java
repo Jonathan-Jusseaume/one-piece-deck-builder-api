@@ -1,5 +1,6 @@
 package com.opcgdb_api.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.opcgdb_api.entity.CardEntity;
 import com.opcgdb_api.entity.DeckEntity;
@@ -8,7 +9,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
-import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneOffset;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
@@ -30,7 +32,8 @@ public class Deck {
 
     private String description;
 
-    private Instant creationDate;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "UTC")
+    private LocalDate creationDate;
 
     private Integer countFavorites = 0;
 
@@ -48,7 +51,7 @@ public class Deck {
         }
         this.leader = new Card(deckEntity.getLeader(), languageCode);
         this.name = deckEntity.getName();
-        this.creationDate = deckEntity.getCreationDate();
+        this.creationDate = LocalDate.ofInstant(deckEntity.getCreationDate(), ZoneOffset.UTC);
         this.description = deckEntity.getDescription();
         this.countFavorites = deckEntity.getCountFavorites();
         this.favorite = deckEntity.isFavorite(mail);
@@ -65,7 +68,7 @@ public class Deck {
                 .setLeader(new CardEntity().setId(leader.getId()))
                 .setDescription(description)
                 .setName(name)
-                .setCreationDate(creationDate)
+                .setCreationDate(creationDate.atStartOfDay().toInstant(ZoneOffset.UTC))
                 .setUsersFavorite(Collections.emptySet())
                 .setCountFavorites(countFavorites);
     }

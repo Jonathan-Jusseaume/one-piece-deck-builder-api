@@ -18,7 +18,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
 import java.nio.charset.StandardCharsets;
-import java.time.Instant;
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
@@ -57,12 +57,12 @@ class ProductControllerTest {
     private static Stream<Arguments> provideLanguageCodesAndExpectedProducts() {
         return Stream.of(
                 Arguments.of("en", Arrays.asList(
-                        new Product().setId("ST-01").setLabel("Straw Hat Crew [ST-01]").setReleaseDate(Instant.parse("2022-10-10T00:00:00Z")),
-                        new Product().setId("ST-02").setLabel("Worst Generation [ST-02]").setReleaseDate(Instant.parse("2022-12-01T00:00:00Z"))
+                        new Product().setId("ST-01").setLabel("Straw Hat Crew [ST-01]").setReleaseDate(LocalDate.parse("2022-10-10")),
+                        new Product().setId("ST-02").setLabel("Worst Generation [ST-02]").setReleaseDate(LocalDate.parse("2022-12-01"))
                 )),
                 Arguments.of("fr", Arrays.asList(
-                        new Product().setId("ST-01").setLabel("Equipage du chapeau de paille [ST-01]").setReleaseDate(Instant.parse("2022-10-10T00:00:00Z")),
-                        new Product().setId("ST-02").setLabel("Génération terrible [ST-02]").setReleaseDate(Instant.parse("2022-12-01T00:00:00Z"))
+                        new Product().setId("ST-01").setLabel("Equipage du chapeau de paille [ST-01]").setReleaseDate(LocalDate.parse("2022-10-10")),
+                        new Product().setId("ST-02").setLabel("Génération terrible [ST-02]").setReleaseDate(LocalDate.parse("2022-12-01"))
                 ))
         );
     }

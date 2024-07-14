@@ -20,7 +20,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -76,7 +77,7 @@ public class DeckService {
         UserEntity userToSave = this.saveUserIfNotExists(deck.getUser());
         deck.setId(UUID.randomUUID());
         deck.setUser(new User(userToSave));
-        deck.setCreationDate(Instant.now());
+        deck.setCreationDate(LocalDate.now(ZoneOffset.UTC));
         return new Deck(deckDao.save(deck.toEntity()), language, userToSave.getMail(), true);
     }
 

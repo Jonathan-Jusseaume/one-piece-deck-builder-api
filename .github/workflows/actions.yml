@@ -15,10 +15,11 @@ jobs:
         with:
           java-version: '21'
           distribution: 'temurin'
-      - name: Build and Analyse
+      - name: Set up Maven
         uses: stCarolas/setup-maven@v4.5
         with:
           maven-version: 3.9.8
+      - name : Run build and analyse
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}

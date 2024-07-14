@@ -45,4 +45,3 @@ springdoc:
   swagger-ui:
     operationsSorter: method
 
-

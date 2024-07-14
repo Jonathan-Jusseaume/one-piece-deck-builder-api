@@ -1,3 +1,4 @@
+
 server:
   port: 8080
   tomcat:
@@ -45,5 +46,4 @@ springdoc:
     path: /api-docs
   swagger-ui:
     operationsSorter: method
-
 

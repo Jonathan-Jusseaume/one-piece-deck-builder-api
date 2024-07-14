@@ -1,0 +1,19 @@
+databaseChangeLog:
+  - changeSet:
+      id : fill-datas
+      author: Jonathan JUSSEAUME
+      changes:
+        - sqlFile:
+            path : classpath:/db/changelog/test-data/scripts/colors.sql
+        - sqlFile:
+            path : classpath:/db/changelog/test-data/scripts/attributes.sql
+        - sqlFile:
+            path : classpath:/db/changelog/test-data/scripts/rarities.sql
+        - sqlFile:
+            path : classpath:/db/changelog/test-data/scripts/types.sql
+        - sqlFile:
+            path : classpath:/db/changelog/test-data/scripts/tags.sql
+        - sqlFile:
+            path : classpath:/db/changelog/test-data/scripts/cards-samples.sql
+        - sqlFile:
+            path : classpath:/db/changelog/test-data/scripts/decks-samples.sql

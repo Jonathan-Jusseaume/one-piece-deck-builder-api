@@ -74,7 +74,8 @@ class CardControllerTest {
                 Arguments.of("page=0&size=10&tagId=1&productId=ST-01", List.of(new Card().setId("ST01-001"), new Card().setId("ST01-012"), new Card().setId("ST01-013"))),
                 Arguments.of("page=0&size=10&rarityId=3", List.of(new Card().setId("ST01-012"), new Card().setId("ST01-013"), new Card().setId("ST02-009"), new Card().setId("ST02-013"))),
                 Arguments.of("page=0&size=10&keyword=Counter", List.of(new Card().setId("ST01-014"), new Card().setId("ST02-015"), new Card().setId("ST02-016"))),
-                Arguments.of("page=0&size=10&keyword=rush !luffy", List.of(new Card().setId("ST01-004")))
+                Arguments.of("page=0&size=10&keyword=rush !luffy", List.of(new Card().setId("ST01-004"))),
+                Arguments.of("page=0&size=10&cost=7&cost=5", List.of(new Card().setId("ST01-012"), new Card().setId("ST02-009"), new Card().setId("ST02-010"), new Card().setId("ST02-013")))
         );
     }
 

@@ -380,7 +380,8 @@ class DeckControllerTest {
         return Stream.of(
                 Arguments.of("page=0&size=10", List.of(new Deck().setId(UUID.fromString("97e852fe-3810-4f60-a143-da10e7c8a760")),
                         new Deck().setId(UUID.fromString("97e852fe-3810-4f60-a143-da10e7c8a680")))),
-                Arguments.of("page=0&size=10&keyword=luffy !starter", Collections.emptyList())
+                Arguments.of("page=0&size=10&keyword=luffy !starter", Collections.emptyList()),
+                Arguments.of("page=0&size=10&colorId=0", List.of(new Deck().setId(UUID.fromString("97e852fe-3810-4f60-a143-da10e7c8a760"))))
         );
     }
 

@@ -5,7 +5,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -34,8 +33,7 @@ public class GoogleSecurityConfiguration {
                                 .jwtAuthenticationConverter(jwtAuthenticationConverter())
                         )
                 )
-                .cors(withDefaults())
-                .csrf(AbstractHttpConfigurer::disable);
+                .cors(withDefaults());
         return http.build();
     }
 

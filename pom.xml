@@ -18,7 +18,10 @@
         <java.version>21</java.version>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
         <sonar.organization>jonathan-jusseaume</sonar.organization>
-        <sonar.exclusions>src/main/java/com/onepiecedeckbuilder/entity/**</sonar.exclusions>
+        <sonar.exclusions>
+            src/main/java/com/onepiecedeckbuilder/entity/**
+            src/test/java/**
+        </sonar.exclusions>
     </properties>
     <dependencies>
         <dependency>

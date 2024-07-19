@@ -16,6 +16,8 @@ import java.util.Set;
 @UtilityClass
 public class DeckSpecification {
 
+    private static final String DESCRIPTION_FIELD = "description";
+
     public static Specification<DeckEntity> distinct() {
         return (root, query, cb) -> {
             query.distinct(true);
@@ -36,9 +38,9 @@ public class DeckSpecification {
                     predicateWord =
                             criteriaBuilder.and(
                                     criteriaBuilder.or(
-                                            criteriaBuilder.isNull(root.get("description"))
+                                            criteriaBuilder.isNull(root.get(DESCRIPTION_FIELD))
                                             , criteriaBuilder.not(
-                                                    criteriaBuilder.like(criteriaBuilder.lower(root.get("description")),
+                                                    criteriaBuilder.like(criteriaBuilder.lower(root.get(DESCRIPTION_FIELD)),
                                                             "%" + word.substring(1).toLowerCase() + "%")
                                             )
                                     ),
@@ -47,7 +49,7 @@ public class DeckSpecification {
                 } else {
                     predicateWord =
                             criteriaBuilder.or(
-                                    criteriaBuilder.like(criteriaBuilder.lower(root.get("description")), "%" + word.toLowerCase() + "%"),
+                                    criteriaBuilder.like(criteriaBuilder.lower(root.get(DESCRIPTION_FIELD)), "%" + word.toLowerCase() + "%"),
                                     criteriaBuilder.like(criteriaBuilder.lower(root.get("name")), "%" + word.toLowerCase() + "%"));
                 }
 

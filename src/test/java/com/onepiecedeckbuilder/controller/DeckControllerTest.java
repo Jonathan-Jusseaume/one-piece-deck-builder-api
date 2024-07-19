@@ -36,6 +36,7 @@ import java.util.UUID;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -183,7 +184,8 @@ class DeckControllerTest {
         this.mockMvc.perform(post("/decks")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(invalidDeck))
-                        .accept(MediaType.APPLICATION_JSON))
+                        .accept(MediaType.APPLICATION_JSON)
+                        .with(csrf()))
                 .andExpect(status().isPreconditionFailed());
     }
 
@@ -198,7 +200,8 @@ class DeckControllerTest {
         this.mockMvc.perform(post("/decks")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(invalidDeck))
-                        .accept(MediaType.APPLICATION_JSON))
+                        .accept(MediaType.APPLICATION_JSON)
+                        .with(csrf()))
                 .andExpect(status().isPreconditionFailed());
     }
 
@@ -214,7 +217,8 @@ class DeckControllerTest {
         this.mockMvc.perform(post("/decks")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(invalidDeck))
-                        .accept(MediaType.APPLICATION_JSON))
+                        .accept(MediaType.APPLICATION_JSON)
+                        .with(csrf()))
                 .andExpect(status().isPreconditionFailed());
     }
 
@@ -230,7 +234,8 @@ class DeckControllerTest {
         this.mockMvc.perform(post("/decks")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(invalidDeck))
-                        .accept(MediaType.APPLICATION_JSON))
+                        .accept(MediaType.APPLICATION_JSON)
+                        .with(csrf()))
                 .andExpect(status().isPreconditionFailed());
     }
 
@@ -245,7 +250,8 @@ class DeckControllerTest {
         MvcResult mvcResult = this.mockMvc.perform(post("/decks")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(validDeck))
-                        .accept(MediaType.APPLICATION_JSON))
+                        .accept(MediaType.APPLICATION_JSON)
+                        .with(csrf()))
                 .andExpect(status().isOk())
                 .andReturn();
 
@@ -263,7 +269,8 @@ class DeckControllerTest {
     @DisplayName("Delete should return 404 not found when the deck with the given ID does not exist")
     void delete_shouldReturn404NotFound_whenDeckWithIDDoesNotExist() throws Exception {
         this.mockMvc.perform(delete("/decks/97e852fe-3810-4f60-a143-da10e7c8a681")
-                        .accept(MediaType.APPLICATION_JSON))
+                        .accept(MediaType.APPLICATION_JSON)
+                        .with(csrf()))
                 .andExpect(status().isNotFound());
     }
 
@@ -283,11 +290,13 @@ class DeckControllerTest {
     @Transactional
     void delete_shouldReturnSuccess_whenDeckWithIDBelongsToUser() throws Exception {
         this.mockMvc.perform(delete("/decks/97e852fe-3810-4f60-a143-da10e7c8a680")
-                        .accept(MediaType.APPLICATION_JSON))
+                        .accept(MediaType.APPLICATION_JSON)
+                        .with(csrf()))
                 .andExpect(status().isOk());
 
         this.mockMvc.perform(get("/decks/97e852fe-3810-4f60-a143-da10e7c8a680")
-                        .accept(MediaType.APPLICATION_JSON))
+                        .accept(MediaType.APPLICATION_JSON)
+                        .with(csrf()))
                 .andExpect(status().isNotFound());
     }
 
@@ -296,7 +305,8 @@ class DeckControllerTest {
     @DisplayName("Favorite should return conflict when the deck with the given ID is already a favorite deck of the user")
     void favorite_shouldReturnConflict_whenDeckIsAlreadyFavoriteOfUser() throws Exception {
         this.mockMvc.perform(post("/decks/97e852fe-3810-4f60-a143-da10e7c8a680/favorite")
-                        .accept(MediaType.APPLICATION_JSON))
+                        .accept(MediaType.APPLICATION_JSON)
+                        .with(csrf()))
                 .andExpect(status().isConflict());
     }
 
@@ -309,11 +319,13 @@ class DeckControllerTest {
         String favoriteDeckID = "97e852fe-3810-4f60-a143-da10e7c8a760";
 
         this.mockMvc.perform(post("/decks/" + favoriteDeckID + "/favorite")
-                        .accept(MediaType.APPLICATION_JSON))
+                        .accept(MediaType.APPLICATION_JSON)
+                        .with(csrf()))
                 .andExpect(status().isOk());
 
         MvcResult mvcResult = this.mockMvc.perform(get("/decks/" + favoriteDeckID)
-                        .accept(MediaType.APPLICATION_JSON))
+                        .accept(MediaType.APPLICATION_JSON)
+                        .with(csrf()))
                 .andExpect(status().isOk())
                 .andReturn();
 
@@ -331,7 +343,8 @@ class DeckControllerTest {
     @DisplayName("Unfavorite should return conflict when the deck with the given ID is not a favorite deck of the user")
     void unfavorite_shouldReturnConflict_whenDeckIsNotFavoriteOfUser() throws Exception {
         this.mockMvc.perform(post("/decks/97e852fe-3810-4f60-a143-da10e7c8a760/unfavorite")
-                        .accept(MediaType.APPLICATION_JSON))
+                        .accept(MediaType.APPLICATION_JSON)
+                        .with(csrf()))
                 .andExpect(status().isConflict());
     }
 
@@ -344,11 +357,13 @@ class DeckControllerTest {
         String unfavoriteDeckID = "97e852fe-3810-4f60-a143-da10e7c8a680";
 
         this.mockMvc.perform(post("/decks/" + unfavoriteDeckID + "/unfavorite")
-                        .accept(MediaType.APPLICATION_JSON))
+                        .accept(MediaType.APPLICATION_JSON)
+                        .with(csrf()))
                 .andExpect(status().isOk());
 
         MvcResult mvcResult = this.mockMvc.perform(get("/decks/" + unfavoriteDeckID)
-                        .accept(MediaType.APPLICATION_JSON))
+                        .accept(MediaType.APPLICATION_JSON)
+                        .with(csrf()))
                 .andExpect(status().isOk())
                 .andReturn();
 
@@ -365,7 +380,8 @@ class DeckControllerTest {
         return Stream.of(
                 Arguments.of("page=0&size=10", List.of(new Deck().setId(UUID.fromString("97e852fe-3810-4f60-a143-da10e7c8a760")),
                         new Deck().setId(UUID.fromString("97e852fe-3810-4f60-a143-da10e7c8a680")))),
-                Arguments.of("page=0&size=10&keyword=luffy !starter", Collections.emptyList())
+                Arguments.of("page=0&size=10&keyword=luffy !starter", Collections.emptyList()),
+                Arguments.of("page=0&size=10&colorId=0", List.of(new Deck().setId(UUID.fromString("97e852fe-3810-4f60-a143-da10e7c8a760"))))
         );
     }
 

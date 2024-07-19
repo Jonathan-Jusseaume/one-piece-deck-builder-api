@@ -11,6 +11,8 @@ import java.util.Set;
 @UtilityClass
 public class CardSpecification {
 
+    private static final String EFFECT_FIELD = "effect";
+
     public static Specification<CardEntity> distinct() {
         return (root, query, cb) -> {
             query.distinct(true);
@@ -28,9 +30,9 @@ public class CardSpecification {
                     predicateWord =
                             criteriaBuilder.and(
                                     criteriaBuilder.or(
-                                            criteriaBuilder.isNull(join.get("effect"))
+                                            criteriaBuilder.isNull(join.get(EFFECT_FIELD))
                                             , criteriaBuilder.not(
-                                                    criteriaBuilder.like(criteriaBuilder.lower(join.get("effect")),
+                                                    criteriaBuilder.like(criteriaBuilder.lower(join.get(EFFECT_FIELD)),
                                                             "%" + word.substring(1).toLowerCase() + "%")
                                             )
                                     ),
@@ -39,7 +41,7 @@ public class CardSpecification {
                 } else {
                     predicateWord =
                             criteriaBuilder.or(
-                                    criteriaBuilder.like(criteriaBuilder.lower(join.get("effect")), "%" + word.toLowerCase() + "%"),
+                                    criteriaBuilder.like(criteriaBuilder.lower(join.get(EFFECT_FIELD)), "%" + word.toLowerCase() + "%"),
                                     criteriaBuilder.like(criteriaBuilder.lower(join.get("name")), "%" + word.toLowerCase() + "%"));
                 }
 

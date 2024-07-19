@@ -20,7 +20,6 @@ import java.util.Set;
 import java.util.UUID;
 
 @RestController
-@CrossOrigin(origins = "*")
 @RequestMapping("/decks")
 @RequiredArgsConstructor
 public class DeckController {

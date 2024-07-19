@@ -22,6 +22,7 @@ public class GoogleSecurityConfiguration {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
+                .cors(withDefaults())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(HttpMethod.POST, "/api/decks").authenticated()
@@ -32,8 +33,7 @@ public class GoogleSecurityConfiguration {
                         .jwt(jwt -> jwt
                                 .jwtAuthenticationConverter(jwtAuthenticationConverter())
                         )
-                )
-                .cors(withDefaults());
+                );
         return http.build();
     }
 

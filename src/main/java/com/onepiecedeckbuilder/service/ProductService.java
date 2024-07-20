@@ -1,7 +1,7 @@
 package com.onepiecedeckbuilder.service;
 
 import com.onepiecedeckbuilder.dto.Product;
-import com.onepiecedeckbuilder.repository.ProductDao;
+import com.onepiecedeckbuilder.repository.ProductRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -13,12 +13,13 @@ import java.util.List;
 @Transactional
 public class ProductService {
 
-    private final ProductDao productDao;
+    private final ProductRepository productRepository;
 
     public List<Product> list(String languageCode) {
-        return productDao.findAll()
+        return productRepository.findAll()
                 .stream()
                 .map(productEntity -> new Product(productEntity, languageCode))
+                .sorted()
                 .toList();
     }
 

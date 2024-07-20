@@ -51,7 +51,7 @@ class ProductControllerTest {
         TypeReference<List<Product>> productListTypeReference = new TypeReference<>() {
         };
         List<Product> actual = objectMapper.readValue(jsonResponse, productListTypeReference);
-        assertThat(actual).containsExactlyInAnyOrderElementsOf(expected);
+        assertThat(actual).containsExactlyElementsOf(expected);
     }
 
     private static Stream<Arguments> provideLanguageCodesAndExpectedProducts() {

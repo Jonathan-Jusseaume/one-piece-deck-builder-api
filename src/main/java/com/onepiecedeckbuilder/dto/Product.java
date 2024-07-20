@@ -3,7 +3,10 @@ package com.onepiecedeckbuilder.dto;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.onepiecedeckbuilder.entity.ProductDescriptionEntity;
 import com.onepiecedeckbuilder.entity.ProductEntity;
-import lombok.*;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import java.time.LocalDate;
@@ -14,8 +17,7 @@ import java.time.ZoneOffset;
 @Accessors(chain = true)
 @NoArgsConstructor
 @EqualsAndHashCode
-@ToString
-public class Product {
+public class Product implements Comparable<Product> {
 
     private String id;
 
@@ -33,5 +35,10 @@ public class Product {
                 break;
             }
         }
+    }
+
+    @Override
+    public int compareTo(Product o) {
+        return this.label.compareTo(o.getLabel());
     }
 }

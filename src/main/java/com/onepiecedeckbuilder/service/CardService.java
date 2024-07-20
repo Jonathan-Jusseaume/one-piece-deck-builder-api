@@ -2,7 +2,7 @@ package com.onepiecedeckbuilder.service;
 
 import com.onepiecedeckbuilder.dto.Card;
 import com.onepiecedeckbuilder.entity.CardEntity;
-import com.onepiecedeckbuilder.repository.CardDao;
+import com.onepiecedeckbuilder.repository.CardRepository;
 import com.onepiecedeckbuilder.repository.specification.CardSpecification;
 import com.onepiecedeckbuilder.repository.specification.SpecificationBuilder;
 import jakarta.transaction.Transactional;
@@ -22,7 +22,7 @@ import java.util.function.Function;
 @Transactional
 public class CardService {
 
-    private final CardDao cardDao;
+    private final CardRepository cardRepository;
 
     public Page<Card> list(Pageable pageable,
                            Set<Long> typesId,
@@ -48,7 +48,7 @@ public class CardService {
         addToFilter(builder, powers, CardSpecification::byPower);
         addKeywordToFilter(builder, keyword);
 
-        Page<CardEntity> results = cardDao.findAll(builder.build(), pageable);
+        Page<CardEntity> results = cardRepository.findAll(builder.build(), pageable);
         List<Card> cards = results.getContent()
                 .stream()
                 .map(cardEntity -> new Card(cardEntity, languageCode))

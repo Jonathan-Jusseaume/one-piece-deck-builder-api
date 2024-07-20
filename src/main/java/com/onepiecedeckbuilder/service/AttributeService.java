@@ -1,7 +1,7 @@
 package com.onepiecedeckbuilder.service;
 
 import com.onepiecedeckbuilder.dto.Attribute;
-import com.onepiecedeckbuilder.repository.AttributeDao;
+import com.onepiecedeckbuilder.repository.AttributeRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -13,10 +13,10 @@ import java.util.List;
 @Transactional
 public class AttributeService {
 
-    private final AttributeDao attributeDao;
+    private final AttributeRepository attributeRepository;
 
     public List<Attribute> list(String languageCode) {
-        return attributeDao.findAll()
+        return attributeRepository.findAll()
                 .stream()
                 .map(attributeEntity -> new Attribute(attributeEntity, languageCode))
                 .toList();

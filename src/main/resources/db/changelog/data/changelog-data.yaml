@@ -70,8 +70,24 @@ databaseChangeLog:
         - sqlFile:
             path: classpath:/db/changelog/data/scripts/promotions/promo-batch-01.sql
   - changeSet:
-      id: booster-08-data
+      id: version-1.4.2-data
       author: Jonathan JUSSEAUME
       changes:
         - sqlFile:
-            path: classpath:/db/changelog/data/scripts/boosters/booster-08.sql
+            path: classpath:/db/changelog/data/scripts/patchs/patch-01-product-name-update.sql
+        - sqlFile:
+            path: classpath:/db/changelog/data/scripts/promotions/promo-batch-02.sql
+        - sqlFile:
+            path: classpath:/db/changelog/data/scripts/starters/starter-14.sql
+        - sqlFile:
+            path: classpath:/db/changelog/data/scripts/starters/starter-15.sql
+        - sqlFile:
+            path: classpath:/db/changelog/data/scripts/starters/starter-16.sql
+        - sqlFile:
+            path: classpath:/db/changelog/data/scripts/starters/starter-17.sql
+        - sqlFile:
+            path: classpath:/db/changelog/data/scripts/starters/starter-18.sql
+        - sqlFile:
+            path: classpath:/db/changelog/data/scripts/starters/starter-19.sql
+        - sqlFile:
+            path: classpath:/db/changelog/data/scripts/starters/starter-20.sql

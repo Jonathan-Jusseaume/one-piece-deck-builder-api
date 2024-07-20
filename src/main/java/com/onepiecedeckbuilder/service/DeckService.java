@@ -8,9 +8,9 @@ import com.onepiecedeckbuilder.entity.ColorEntity;
 import com.onepiecedeckbuilder.entity.DeckEntity;
 import com.onepiecedeckbuilder.entity.UserEntity;
 import com.onepiecedeckbuilder.exceptions.*;
-import com.onepiecedeckbuilder.repository.CardDao;
-import com.onepiecedeckbuilder.repository.DeckDao;
-import com.onepiecedeckbuilder.repository.UserDao;
+import com.onepiecedeckbuilder.repository.CardRepository;
+import com.onepiecedeckbuilder.repository.DeckRepository;
+import com.onepiecedeckbuilder.repository.UserRepository;
 import com.onepiecedeckbuilder.repository.specification.DeckSpecification;
 import com.onepiecedeckbuilder.repository.specification.SpecificationBuilder;
 import jakarta.transaction.Transactional;
@@ -36,11 +36,11 @@ public class DeckService {
     public static final int MAX_CARDS_IN_DECK = 50;
     public static final int MAX_COPIES_NUMBER_OF_CARD_PER_DECK = 4;
 
-    private final DeckDao deckDao;
+    private final DeckRepository deckRepository;
 
-    private final UserDao userDao;
+    private final UserRepository userRepository;
 
-    private final CardDao cardDao;
+    private final CardRepository cardRepository;
 
     public Page<Deck> list(Pageable pageable, boolean onlyUserDeck, Set<Long> colorsId, String keyword, User connectedUser,
                            boolean onlyFavorite, String language) throws UserUnauthorizedException {
@@ -56,7 +56,7 @@ public class DeckService {
         addColorsToFilter(builder, colorsId);
         addKeywordToFilter(builder, keyword);
         addOnlyFavoriteToFilter(builder, connectedUser, onlyFavorite);
-        Page<DeckEntity> results = deckDao.findAll(builder.build(), pageable);
+        Page<DeckEntity> results = deckRepository.findAll(builder.build(), pageable);
         return new PageImpl<>(
                 results.getContent()
                         .stream()
@@ -81,7 +81,7 @@ public class DeckService {
         deck.setId(UUID.randomUUID());
         deck.setUser(new User(userToSave));
         deck.setCreationDate(LocalDate.now(ZoneOffset.UTC));
-        return new Deck(deckDao.save(deck.toEntity()), language, userToSave.getMail(), true);
+        return new Deck(deckRepository.save(deck.toEntity()), language, userToSave.getMail(), true);
     }
 
     public Deck favorite(UUID id, User connectedUser, String language) throws DeckNotFoundException, DeckAlreadyFavoritedException, DeckNotFavoritedException {
@@ -112,30 +112,30 @@ public class DeckService {
                     .collect(Collectors.toSet()));
             deckEntity.setCountFavorites(deckEntity.getCountFavorites() - 1);
         }
-        return new Deck(deckDao.save(deckEntity), language, userToSave.getMail(), false);
+        return new Deck(deckRepository.save(deckEntity), language, userToSave.getMail(), false);
     }
 
     public void delete(UUID id, User user) throws DeckOwnershipException, DeckNotFoundException {
-        Optional<DeckEntity> deckEntity = deckDao.findById(id);
+        Optional<DeckEntity> deckEntity = deckRepository.findById(id);
         if (deckEntity.isEmpty()) {
             throw new DeckNotFoundException();
         }
         if (!deckEntity.get().getUser().getMail().equals(user.getMail())) {
             throw new DeckOwnershipException();
         }
-        this.deckDao.deleteById(id);
+        this.deckRepository.deleteById(id);
     }
 
     private UserEntity saveUserIfNotExists(User user) {
-        Optional<UserEntity> optionalUserEntity = userDao.findById(user.getMail());
+        Optional<UserEntity> optionalUserEntity = userRepository.findById(user.getMail());
         return optionalUserEntity.orElseGet(() -> {
             user.setCreationDate(LocalDate.now(ZoneOffset.UTC));
-            return userDao.saveAndFlush(user.toEntity());
+            return userRepository.saveAndFlush(user.toEntity());
         });
     }
 
     private DeckEntity readById(UUID id) throws DeckNotFoundException {
-        Optional<DeckEntity> deckEntity = deckDao.findById(id);
+        Optional<DeckEntity> deckEntity = deckRepository.findById(id);
         if (deckEntity.isEmpty()) {
             throw new DeckNotFoundException();
         }
@@ -147,7 +147,7 @@ public class DeckService {
                 || deck.getName().isEmpty()) {
             return false;
         }
-        Optional<CardEntity> leaderEntityOptional = cardDao.findById(deck.getLeader().getId());
+        Optional<CardEntity> leaderEntityOptional = cardRepository.findById(deck.getLeader().getId());
         if (leaderEntityOptional.isEmpty()) {
             return false;
         }
@@ -174,7 +174,7 @@ public class DeckService {
     }
 
     private boolean validCardsColors(Deck deck, CardEntity leaderEntity) {
-        List<CardEntity> cardEntities = cardDao.findAllById(deck.getCards()
+        List<CardEntity> cardEntities = cardRepository.findAllById(deck.getCards()
                 .stream()
                 .map(Card::getId)
                 .toList());

@@ -224,6 +224,23 @@ class DeckControllerTest {
 
     @Test
     @WithMockUser(username = "test-user")
+    @DisplayName("Create should return precondition failed when the leader provided is not of LEADER type")
+    void create_shouldReturnPreconditionFailed_whenLeaderProvidedIsNotALeader() throws Exception {
+        Deck invalidDeck = new Deck()
+                .setName("Test Deck")
+                .setLeader(new Card().setId("ST02-002"))
+                .setCards(sampleCardList());
+
+        this.mockMvc.perform(post("/decks")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(new ObjectMapper().writeValueAsString(invalidDeck))
+                        .accept(MediaType.APPLICATION_JSON)
+                        .with(csrf()))
+                .andExpect(status().isPreconditionFailed());
+    }
+
+    @Test
+    @WithMockUser(username = "test-user")
     @DisplayName("Create should return precondition failed when cards are not of the color of the leader")
     void create_shouldReturnPreconditionFailed_whenCardsAreNotOfTheColorOfTheLeader() throws Exception {
         Deck invalidDeck = new Deck()
@@ -381,7 +398,7 @@ class DeckControllerTest {
                 Arguments.of("page=0&size=10", List.of(new Deck().setId(UUID.fromString("97e852fe-3810-4f60-a143-da10e7c8a760")),
                         new Deck().setId(UUID.fromString("97e852fe-3810-4f60-a143-da10e7c8a680")))),
                 Arguments.of("page=0&size=10&keyword=luffy !starter", Collections.emptyList()),
-                Arguments.of("page=0&size=10&colorId=0", List.of(new Deck().setId(UUID.fromString("97e852fe-3810-4f60-a143-da10e7c8a760"))))
+                Arguments.of("page=0&size=10&color=RED", List.of(new Deck().setId(UUID.fromString("97e852fe-3810-4f60-a143-da10e7c8a760"))))
         );
     }
 

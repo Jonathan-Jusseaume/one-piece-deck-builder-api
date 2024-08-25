@@ -1,6 +1,9 @@
 package com.onepiecedeckbuilder.service;
 
 import com.onepiecedeckbuilder.dto.Card;
+import com.onepiecedeckbuilder.dto.Color;
+import com.onepiecedeckbuilder.dto.Rarity;
+import com.onepiecedeckbuilder.dto.Type;
 import com.onepiecedeckbuilder.entity.CardEntity;
 import com.onepiecedeckbuilder.repository.CardRepository;
 import com.onepiecedeckbuilder.repository.specification.CardSpecification;
@@ -25,10 +28,10 @@ public class CardService {
     private final CardRepository cardRepository;
 
     public Page<Card> list(Pageable pageable,
-                           Set<Long> typesId,
-                           Set<Long> colorsId,
+                           Set<Type> types,
+                           Set<Color> colors,
                            Set<Long> tagsId,
-                           Set<Long> raritiesId,
+                           Set<Rarity> rarities,
                            Set<String> productsId,
                            Set<Integer> costs,
                            Set<Integer> powers,
@@ -39,10 +42,10 @@ public class CardService {
         SpecificationBuilder<CardEntity> builder = new SpecificationBuilder<>();
         builder.with(CardSpecification.distinct());
 
-        addToFilter(builder, typesId, CardSpecification::byTypeId);
-        addToFilter(builder, colorsId, CardSpecification::byColorId);
+        addToFilter(builder, types, CardSpecification::byType);
+        addToFilter(builder, colors, CardSpecification::byColor);
         addToFilter(builder, tagsId, CardSpecification::byTagId);
-        addToFilter(builder, raritiesId, CardSpecification::byRarity);
+        addToFilter(builder, rarities, CardSpecification::byRarity);
         addToFilter(builder, productsId, CardSpecification::byProductId);
         addToFilter(builder, costs, CardSpecification::byCost);
         addToFilter(builder, powers, CardSpecification::byPower);

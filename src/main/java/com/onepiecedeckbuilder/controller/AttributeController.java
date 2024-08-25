@@ -4,7 +4,6 @@ import com.onepiecedeckbuilder.dto.Attribute;
 import com.onepiecedeckbuilder.service.AttributeService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -21,7 +20,7 @@ public class AttributeController {
     @Operation(summary = "Get the list of all the different attributes")
     @GetMapping
     public List<Attribute> list() {
-        return attributeService.list(LocaleContextHolder.getLocale().getLanguage());
+        return attributeService.list();
     }
 
 }

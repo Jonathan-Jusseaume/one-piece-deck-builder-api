@@ -1,5 +1,6 @@
 package com.onepiecedeckbuilder.entity;
 
+import com.onepiecedeckbuilder.dto.Rarity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -19,9 +20,9 @@ public class CardImageEntity {
     @Column(name = "NAME", nullable = false)
     private String name;
 
-    @OneToOne
-    @JoinColumn(name = "RARITY_ID")
-    private RarityEntity rarity;
+    @Column(name = "RARITY")
+    @Enumerated(EnumType.STRING)
+    private Rarity rarity;
 
     @OneToOne
     @JoinColumn(name = "PRODUCT_ID")

@@ -1,7 +1,7 @@
 package com.onepiecedeckbuilder.repository.specification;
 
+import com.onepiecedeckbuilder.dto.Color;
 import com.onepiecedeckbuilder.entity.CardEntity;
-import com.onepiecedeckbuilder.entity.ColorEntity;
 import com.onepiecedeckbuilder.entity.DeckEntity;
 import com.onepiecedeckbuilder.entity.UserEntity;
 import jakarta.persistence.criteria.Join;
@@ -63,11 +63,11 @@ public class DeckSpecification {
         });
     }
 
-    public static Specification<DeckEntity> byColorId(Set<Long> colorsId) {
+    public static Specification<DeckEntity> byColor(Set<Color> colors) {
         return ((root, criteriaQuery, criteriaBuilder) -> {
-            Join<DeckEntity, CardEntity> join = root.join("leader");
-            SetJoin<CardEntity, ColorEntity> colorsJoin = join.joinSet("colors");
-            return colorsJoin.get("id").in(colorsId);
+            Join<DeckEntity, CardEntity> leaderJoin = root.join("leader");
+            Join<CardEntity, Color> colorsJoin = leaderJoin.join("colors");
+            return colorsJoin.in(colors);
         });
     }
 

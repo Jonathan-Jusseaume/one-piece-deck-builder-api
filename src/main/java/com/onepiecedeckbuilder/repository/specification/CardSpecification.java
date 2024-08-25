@@ -1,6 +1,10 @@
 package com.onepiecedeckbuilder.repository.specification;
 
+import com.onepiecedeckbuilder.dto.Color;
+import com.onepiecedeckbuilder.dto.Rarity;
+import com.onepiecedeckbuilder.dto.Type;
 import com.onepiecedeckbuilder.entity.*;
+import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.SetJoin;
 import lombok.experimental.UtilityClass;
@@ -55,16 +59,16 @@ public class CardSpecification {
         });
     }
 
-    public static Specification<CardEntity> byTypeId(Set<Long> typesId) {
+    public static Specification<CardEntity> byType(Set<Type> types) {
         return (root, criteriaQuery, criteriaBuilder) -> criteriaBuilder
-                .in(root.get("type").get("id"))
-                .value(typesId);
+                .in(root.get("type"))
+                .value(types);
     }
 
-    public static Specification<CardEntity> byColorId(Set<Long> colorsId) {
+    public static Specification<CardEntity> byColor(Set<Color> colors) {
         return ((root, criteriaQuery, criteriaBuilder) -> {
-            SetJoin<CardEntity, ColorEntity> join = root.joinSet("colors");
-            return join.get("id").in(colorsId);
+            Join<CardEntity, Color> colorsJoin = root.join("colors");
+            return colorsJoin.in(colors);
         });
     }
 
@@ -75,10 +79,10 @@ public class CardSpecification {
         });
     }
 
-    public static Specification<CardEntity> byRarity(Set<Long> rarityId) {
+    public static Specification<CardEntity> byRarity(Set<Rarity> rarities) {
         return ((root, criteriaQuery, criteriaBuilder) -> {
             SetJoin<CardEntity, CardImageEntity> join = root.joinSet("images");
-            return join.get("rarity").get("id").in(rarityId);
+            return join.get("rarity").in(rarities);
         });
     }
 

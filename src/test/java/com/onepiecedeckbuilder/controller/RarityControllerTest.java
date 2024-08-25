@@ -15,7 +15,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -33,17 +32,6 @@ class RarityControllerTest {
     @Test
     @DisplayName("Should return all rarities in the specified order")
     void shouldReturnAllRaritiesInTheSpecifiedOrder() throws Exception {
-        List<Rarity> expected = Arrays.asList(
-                new Rarity().setId(0L).setLabel("L"),
-                new Rarity().setId(1L).setLabel("C"),
-                new Rarity().setId(2L).setLabel("UC"),
-                new Rarity().setId(5L).setLabel("R"),
-                new Rarity().setId(3L).setLabel("SR"),
-                new Rarity().setId(4L).setLabel("SEC"),
-                new Rarity().setId(6L).setLabel("SP CARD"),
-                new Rarity().setId(7L).setLabel("P")
-        );
-
         MvcResult mvcResult = this.mockMvc.perform(get("/rarities")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -55,6 +43,6 @@ class RarityControllerTest {
         TypeReference<List<Rarity>> rarityListTypeReference = new TypeReference<>() {};
         List<Rarity> actual = objectMapper.readValue(jsonResponse, rarityListTypeReference);
 
-        assertThat(actual).isEqualTo(expected);
+        assertThat(actual).isEqualTo(List.of(Rarity.values()));
     }
 }

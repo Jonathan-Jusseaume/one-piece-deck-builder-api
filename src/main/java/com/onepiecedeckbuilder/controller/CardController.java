@@ -1,6 +1,9 @@
 package com.onepiecedeckbuilder.controller;
 
 import com.onepiecedeckbuilder.dto.Card;
+import com.onepiecedeckbuilder.dto.Color;
+import com.onepiecedeckbuilder.dto.Rarity;
+import com.onepiecedeckbuilder.dto.Type;
 import com.onepiecedeckbuilder.service.CardService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -28,22 +31,22 @@ public class CardController {
             @PageableDefault(size = 25)
             @SortDefault(sort = "id", direction = Sort.Direction.ASC)
             Pageable pageable,
-            @RequestParam(required = false, name = "typeId")
-            @Parameter(name = "typeId",
-                    description = "Type Id of the card. You can put multiple values")
-            Set<Long> typesId,
-            @RequestParam(required = false, name = "colorId")
-            @Parameter(name = "colorId",
-                    description = "Color Id of the card. You can put multiple values")
-            Set<Long> colorId,
+            @RequestParam(required = false, name = "type")
+            @Parameter(name = "type",
+                    description = "Type of the card. You can put multiple values")
+            Set<Type> types,
+            @RequestParam(required = false, name = "color")
+            @Parameter(name = "color",
+                    description = "Color of the card. You can put multiple values")
+            Set<Color> colors,
             @RequestParam(required = false, name = "tagId")
             @Parameter(name = "tagId",
                     description = "Tag Id of the card. You can put multiple values")
             Set<Long> tagsId,
-            @RequestParam(required = false, name = "rarityId")
-            @Parameter(name = "rarityId",
+            @RequestParam(required = false, name = "rarity")
+            @Parameter(name = "rarity",
                     description = "Rarity Id of the card. You can put multiple values")
-            Set<Long> raritiesId,
+            Set<Rarity> rarities,
             @RequestParam(required = false, name = "productId")
             @Parameter(name = "productId",
                     description = "Product Id of the card. You can put multiple values")
@@ -62,10 +65,10 @@ public class CardController {
                             "in order to search cards which don't have this word.")
             String keyword) {
         return cardService.list(pageable,
-                typesId,
-                colorId,
+                types,
+                colors,
                 tagsId,
-                raritiesId,
+                rarities,
                 productsId,
                 costs,
                 powers,

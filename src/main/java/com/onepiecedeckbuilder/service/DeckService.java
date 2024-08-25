@@ -1,10 +1,7 @@
 package com.onepiecedeckbuilder.service;
 
-import com.onepiecedeckbuilder.dto.Card;
-import com.onepiecedeckbuilder.dto.Deck;
-import com.onepiecedeckbuilder.dto.User;
+import com.onepiecedeckbuilder.dto.*;
 import com.onepiecedeckbuilder.entity.CardEntity;
-import com.onepiecedeckbuilder.entity.ColorEntity;
 import com.onepiecedeckbuilder.entity.DeckEntity;
 import com.onepiecedeckbuilder.entity.UserEntity;
 import com.onepiecedeckbuilder.exceptions.*;
@@ -42,7 +39,7 @@ public class DeckService {
 
     private final CardRepository cardRepository;
 
-    public Page<Deck> list(Pageable pageable, boolean onlyUserDeck, Set<Long> colorsId, String keyword, User connectedUser,
+    public Page<Deck> list(Pageable pageable, boolean onlyUserDeck, Set<Color> colors, String keyword, User connectedUser,
                            boolean onlyFavorite, String language) throws UserUnauthorizedException {
         if ((onlyFavorite || onlyUserDeck) && connectedUser == null) {
             throw new UserUnauthorizedException();
@@ -53,7 +50,7 @@ public class DeckService {
         SpecificationBuilder<DeckEntity> builder = new SpecificationBuilder<>();
         builder.with(DeckSpecification.distinct());
         addMailToFilter(builder, connectedUser, onlyUserDeck);
-        addColorsToFilter(builder, colorsId);
+        addColorsToFilter(builder, colors);
         addKeywordToFilter(builder, keyword);
         addOnlyFavoriteToFilter(builder, connectedUser, onlyFavorite);
         Page<DeckEntity> results = deckRepository.findAll(builder.build(), pageable);
@@ -148,7 +145,7 @@ public class DeckService {
             return false;
         }
         Optional<CardEntity> leaderEntityOptional = cardRepository.findById(deck.getLeader().getId());
-        if (leaderEntityOptional.isEmpty()) {
+        if (leaderEntityOptional.isEmpty() || !leaderEntityOptional.get().getType().equals(Type.LEADER)) {
             return false;
         }
         if (!validCardsNumbers(deck)) {
@@ -196,8 +193,7 @@ public class DeckService {
                 .anyMatch(color -> cardSelected != null &&
                         cardSelected.getColors()
                                 .stream()
-                                .map(ColorEntity::getId)
-                                .anyMatch(colorId -> color.getId().equals(colorId)));
+                                .anyMatch(color::equals));
     }
 
     private void addMailToFilter(SpecificationBuilder<DeckEntity> builder, User userConnected, boolean onlyUserDeck) {
@@ -212,9 +208,9 @@ public class DeckService {
         }
     }
 
-    private void addColorsToFilter(SpecificationBuilder<DeckEntity> builder, Set<Long> colorsId) {
-        if (colorsId != null && !colorsId.isEmpty()) {
-            builder.with(DeckSpecification.byColorId(colorsId));
+    private void addColorsToFilter(SpecificationBuilder<DeckEntity> builder, Set<Color> colors) {
+        if (colors != null && !colors.isEmpty()) {
+            builder.with(DeckSpecification.byColor(colors));
         }
     }
 

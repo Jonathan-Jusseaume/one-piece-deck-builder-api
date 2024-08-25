@@ -1,0 +1,13 @@
+databaseChangeLog:
+  - changeSet:
+      id : reorganize-database
+      author: Jonathan JUSSEAUME
+      changes:
+        - sqlFile:
+            path : classpath:/db/changelog/structure/scripts/reorganize-color.sql
+        - sqlFile:
+            path: classpath:/db/changelog/structure/scripts/reorganize-type.sql
+        - sqlFile:
+            path: classpath:/db/changelog/structure/scripts/reorganize-attribute.sql
+        - sqlFile:
+            path: classpath:/db/changelog/structure/scripts/reorganize-rarity.sql

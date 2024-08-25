@@ -20,10 +20,10 @@ public class CardImage implements Comparable<CardImage> {
 
     private Product product;
 
-    public CardImage(CardImageEntity cardEntity, String languageCode) {
-        this.filename = cardEntity.getName();
-        this.rarity = new Rarity(cardEntity.getRarity());
-        this.product = new Product(cardEntity.getProduct(), languageCode);
+    public CardImage(CardImageEntity cardImageEntity, String languageCode) {
+        this.filename = cardImageEntity.getName();
+        this.rarity = cardImageEntity.getRarity();
+        this.product = new Product(cardImageEntity.getProduct(), languageCode);
     }
 
     @Override

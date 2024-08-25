@@ -1,10 +1,14 @@
 package com.onepiecedeckbuilder.entity;
 
+import com.onepiecedeckbuilder.dto.Attribute;
+import com.onepiecedeckbuilder.dto.Color;
+import com.onepiecedeckbuilder.dto.Type;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
+import java.util.List;
 import java.util.Set;
 
 @Getter
@@ -18,24 +22,23 @@ public class CardEntity {
     @Column(name = "ID", nullable = false)
     private String id;
 
-    @OneToOne
-    @JoinColumn(name = "TYPE_ID")
-    private TypeEntity type;
+    @Column(name = "TYPE")
+    @Enumerated(EnumType.STRING)
+    private Type type;
 
-    @OneToOne
-    @JoinColumn(name = "ATTRIBUTE_ID")
-    private AttributeEntity attribute;
+    @Column(name = "ATTRIBUTE")
+    @Enumerated(EnumType.STRING)
+    private Attribute attribute;
 
     @OneToMany
     @JoinColumn(name = "CARD_ID")
     private Set<CardDescriptionEntity> descriptions;
 
-    @ManyToMany
-    @JoinTable(name = "UT_CARD_COLOR",
-            joinColumns = @JoinColumn(name = "CARD_ID"),
-            inverseJoinColumns = @JoinColumn(name = "COLOR_ID")
-    )
-    private Set<ColorEntity> colors;
+    @ElementCollection(targetClass = Color.class, fetch = FetchType.EAGER)
+    @CollectionTable(name = "UT_CARD_COLOR", joinColumns = @JoinColumn(name = "CARD_ID"))
+    @Column(name = "COLOR")
+    @Enumerated(EnumType.STRING)
+    private List<Color> colors;
 
     @ManyToMany
     @JoinTable(name = "UT_CARD_TAG",

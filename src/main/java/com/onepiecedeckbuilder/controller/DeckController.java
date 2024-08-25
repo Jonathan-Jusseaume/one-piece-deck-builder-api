@@ -1,5 +1,6 @@
 package com.onepiecedeckbuilder.controller;
 
+import com.onepiecedeckbuilder.dto.Color;
 import com.onepiecedeckbuilder.dto.Deck;
 import com.onepiecedeckbuilder.dto.User;
 import com.onepiecedeckbuilder.exceptions.*;
@@ -32,10 +33,10 @@ public class DeckController {
             @PageableDefault(size = 25)
             @SortDefault(sort = {"countFavorites", "creationDate"}, direction = Sort.Direction.DESC)
             Pageable pageable,
-            @RequestParam(required = false, name = "colorId")
-            @Parameter(name = "colorId",
+            @RequestParam(required = false, name = "color")
+            @Parameter(name = "color",
                     description = "Color Id of the leader of the deck. You can put multiple values")
-            Set<Long> colorsId,
+            Set<Color> colors,
             @RequestParam(required = false)
             @Parameter(name = "keyword",
                     description = "Keywords which are in the deck name or the deck description. You can prefix them with \"!\" " +
@@ -52,7 +53,7 @@ public class DeckController {
             Boolean onlyUserDeck) throws UserUnauthorizedException {
         User connectedUser = getConnectedUser();
         return deckService.list(
-                pageable, onlyUserDeck, colorsId, keyword, connectedUser, onlyFavorite,
+                pageable, onlyUserDeck, colors, keyword, connectedUser, onlyFavorite,
                 LocaleContextHolder.getLocale().getLanguage()
         );
     }

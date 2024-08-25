@@ -23,13 +23,13 @@ public class User {
 
     public User(UserEntity userEntity) {
         this.setMail(userEntity.getMail())
-                .setCreationDate(LocalDate.ofInstant(userEntity.getJoinDate(), ZoneOffset.UTC))
+                .setCreationDate(userEntity.getJoinDate() != null ? LocalDate.ofInstant(userEntity.getJoinDate(), ZoneOffset.UTC) : null)
                 .setProfilePicture(userEntity.getProfilePicture());
     }
 
     public UserEntity toEntity() {
         return new UserEntity()
-                .setJoinDate(creationDate.atStartOfDay().toInstant(ZoneOffset.UTC))
+                .setJoinDate(creationDate != null ? creationDate.atStartOfDay().toInstant(ZoneOffset.UTC) : null)
                 .setMail(mail)
                 .setProfilePicture(profilePicture);
     }

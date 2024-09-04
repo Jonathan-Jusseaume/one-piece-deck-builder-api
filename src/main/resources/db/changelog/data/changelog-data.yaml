@@ -14,7 +14,7 @@ databaseChangeLog:
         - sqlFile:
             path: classpath:/db/changelog/data/scripts/common/tags.sql
   - changeSet:
-      id: recovery-starters
+      id: recovery-first-release
       author: Jonathan JUSSEAUME
       changes:
         - sqlFile:
@@ -26,49 +26,71 @@ databaseChangeLog:
         - sqlFile:
             path: classpath:/db/changelog/data/scripts/starters/starter-04.sql
         - sqlFile:
+            path: classpath:/db/changelog/data/scripts/boosters/booster-01.sql
+  - changeSet:
+      id: recovery-second-release
+      author: Jonathan JUSSEAUME
+      changes:
+        - sqlFile:
             path: classpath:/db/changelog/data/scripts/starters/starter-05.sql
         - sqlFile:
             path: classpath:/db/changelog/data/scripts/starters/starter-06.sql
         - sqlFile:
+            path: classpath:/db/changelog/data/scripts/boosters/booster-02.sql
+  - changeSet:
+      id: recovery-third-release
+      author: Jonathan JUSSEAUME
+      changes:
+        - sqlFile:
             path: classpath:/db/changelog/data/scripts/starters/starter-07.sql
+        - sqlFile:
+            path: classpath:/db/changelog/data/scripts/boosters/booster-03.sql
+  - changeSet:
+      id: recovery-fourth-release
+      author: Jonathan JUSSEAUME
+      changes:
         - sqlFile:
             path: classpath:/db/changelog/data/scripts/starters/starter-08.sql
         - sqlFile:
             path: classpath:/db/changelog/data/scripts/starters/starter-09.sql
         - sqlFile:
+            path: classpath:/db/changelog/data/scripts/boosters/booster-04.sql
+  - changeSet:
+      id: recovery-fifth-release
+      author: Jonathan JUSSEAUME
+      changes:
+        - sqlFile:
             path: classpath:/db/changelog/data/scripts/starters/starter-10.sql
         - sqlFile:
             path: classpath:/db/changelog/data/scripts/starters/starter-11.sql
         - sqlFile:
-            path: classpath:/db/changelog/data/scripts/starters/starter-12.sql
-        - sqlFile:
-            path: classpath:/db/changelog/data/scripts/starters/starter-13.sql
+            path: classpath:/db/changelog/data/scripts/boosters/booster-05.sql
   - changeSet:
-      id: recovery-boosters
+      id: recovery-sixth-release
       author: Jonathan JUSSEAUME
       changes:
         - sqlFile:
-            path: classpath:/db/changelog/data/scripts/boosters/booster-01.sql
-        - sqlFile:
-            path: classpath:/db/changelog/data/scripts/boosters/booster-02.sql
-        - sqlFile:
-            path: classpath:/db/changelog/data/scripts/boosters/booster-03.sql
-        - sqlFile:
-            path: classpath:/db/changelog/data/scripts/boosters/booster-04.sql
-        - sqlFile:
-            path: classpath:/db/changelog/data/scripts/boosters/booster-05.sql
+            path: classpath:/db/changelog/data/scripts/starters/starter-12.sql
         - sqlFile:
             path: classpath:/db/changelog/data/scripts/boosters/booster-06.sql
+  - changeSet:
+      id: recovery-seventh-release
+      author: Jonathan JUSSEAUME
+      changes:
         - sqlFile:
             path: classpath:/db/changelog/data/scripts/boosters/booster-07.sql
+        - sqlFile:
+            path: classpath:/db/changelog/data/scripts/starters/starter-13.sql
+        - sqlFile:
+            path: classpath:/db/changelog/data/scripts/boosters/ebooster-01.sql
   - changeSet:
       id: recovery-promotions
       author: Jonathan JUSSEAUME
       changes:
         - sqlFile:
-            path: classpath:/db/changelog/data/scripts/promotions/promo-25th-anniversary.sql
-        - sqlFile:
             path: classpath:/db/changelog/data/scripts/promotions/promo-batch-01.sql
+        - sqlFile:
+            path: classpath:/db/changelog/data/scripts/promotions/promo-25th-anniversary.sql
   - changeSet:
       id: version-1.4.2-data
       author: Jonathan JUSSEAUME
@@ -91,3 +113,11 @@ databaseChangeLog:
             path: classpath:/db/changelog/data/scripts/starters/starter-19.sql
         - sqlFile:
             path: classpath:/db/changelog/data/scripts/starters/starter-20.sql
+        - sqlFile:
+            path: classpath:/db/changelog/data/scripts/boosters/booster-08.sql
+  - changeSet:
+      id: version-1.4.3-data
+      author: Jonathan JUSSEAUME
+      changes:
+        - sqlFile:
+            path: classpath:/db/changelog/data/scripts/boosters/booster-09.sql

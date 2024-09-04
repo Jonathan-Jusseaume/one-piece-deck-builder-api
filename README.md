@@ -2,7 +2,7 @@
 
 [![Bugs](https://sonarcloud.io/api/project_badges/measure?project=Jonathan-Jusseaume_one_piece_deck_builder_api&metric=bugs)](https://sonarcloud.io/summary/new_code?id=Jonathan-Jusseaume_one_piece_deck_builder_api) [![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=Jonathan-Jusseaume_one_piece_deck_builder_api&metric=code_smells)](https://sonarcloud.io/summary/new_code?id=Jonathan-Jusseaume_one_piece_deck_builder_api) [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=Jonathan-Jusseaume_one_piece_deck_builder_api&metric=coverage)](https://sonarcloud.io/summary/new_code?id=Jonathan-Jusseaume_one_piece_deck_builder_api) [![Duplicated Lines (%)](https://sonarcloud.io/api/project_badges/measure?project=Jonathan-Jusseaume_one_piece_deck_builder_api&metric=duplicated_lines_density)](https://sonarcloud.io/summary/new_code?id=Jonathan-Jusseaume_one_piece_deck_builder_api) [![Technical Debt](https://sonarcloud.io/api/project_badges/measure?project=Jonathan-Jusseaume_one_piece_deck_builder_api&metric=sqale_index)](https://sonarcloud.io/summary/new_code?id=Jonathan-Jusseaume_one_piece_deck_builder_api) [![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=Jonathan-Jusseaume_one_piece_deck_builder_api&metric=sqale_rating)](https://sonarcloud.io/summary/new_code?id=Jonathan-Jusseaume_one_piece_deck_builder_api) [![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=Jonathan-Jusseaume_one_piece_deck_builder_api&metric=vulnerabilities)](https://sonarcloud.io/summary/new_code?id=Jonathan-Jusseaume_one_piece_deck_builder_api)
 
-Current version: `1.4.2`
+Current version: `1.4.3`
 
 ## Overview
 

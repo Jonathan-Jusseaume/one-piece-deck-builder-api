@@ -9,7 +9,7 @@
     </parent>
     <groupId>com.onepiecedeckbuilder</groupId>
     <artifactId>one-piece-deck-builder</artifactId>
-    <version>1.4.3</version>
+    <version>1.4.4</version>
     <name>One Piece Deck Builder API</name>
     <description>This project provides an API for One Piece Deck Builder, allowing users to access card
         information and create decks using their Google account.

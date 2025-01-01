@@ -7,6 +7,8 @@ import com.onepiecedeckbuilder.exceptions.*;
 import com.onepiecedeckbuilder.service.DeckService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
@@ -58,7 +60,21 @@ public class DeckController {
         );
     }
 
-    @Operation(summary = "Read the deck with the ID in the path")
+    @Operation(
+            summary = "Read the deck with the ID in the path",
+            description = "Fetches a deck by its ID. Throws a DeckNotFoundException if the deck is not found.",
+            responses = {
+                    @ApiResponse(
+                            description = "Successfully retrieved the deck",
+                            responseCode = "200"
+                    ),
+                    @ApiResponse(
+                            description = "Deck with the given ID not found",
+                            responseCode = "404",
+                            content = @Content(mediaType = "application/json")
+                    )
+            }
+    )
     @GetMapping("{id}")
     public Deck read(
             @Parameter(description = "ID of the deck")

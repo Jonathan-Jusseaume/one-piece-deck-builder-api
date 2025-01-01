@@ -7,6 +7,7 @@ import com.onepiecedeckbuilder.dto.Type;
 import com.onepiecedeckbuilder.service.CardService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
@@ -21,6 +22,7 @@ import java.util.Set;
 @RestController
 @RequestMapping("/cards")
 @RequiredArgsConstructor
+@Tag(name = "cards", description = "Operations related to cards")
 public class CardController {
 
     private final CardService cardService;

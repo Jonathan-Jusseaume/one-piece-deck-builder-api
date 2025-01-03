@@ -21,9 +21,12 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.util.CollectionUtils;
+import org.springframework.util.MultiValueMap;
 
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -41,9 +44,10 @@ class CardControllerTest {
     @ParameterizedTest
     @MethodSource("provideParametersAndExpectedResults")
     @DisplayName("Should return filtered cards based on various parameters")
-    void shouldReturnFilteredCardsBasedOnVariousParameters(String queryParams, List<Card> expectedCards) throws Exception {
+    void shouldReturnFilteredCardsBasedOnVariousParameters(MultiValueMap<String, String> parameters, List<Card> expectedCards) throws Exception {
 
-        MvcResult mvcResult = this.mockMvc.perform(get("/cards?" + queryParams)
+        MvcResult mvcResult = this.mockMvc.perform(get("/cards")
+                        .queryParams(parameters)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andReturn();
@@ -69,13 +73,34 @@ class CardControllerTest {
 
     private static Stream<Arguments> provideParametersAndExpectedResults() {
         return Stream.of(
-                Arguments.of("page=0&size=10&power=6000", List.of(new Card().setId("ST01-010"), new Card().setId("ST01-012"), new Card().setId("ST02-006"), new Card().setId("ST02-009"), new Card().setId("ST02-010"))),
-                Arguments.of("page=0&size=10&type=LEADER&color=RED", List.of(new Card().setId("ST01-001"))),
-                Arguments.of("page=0&size=10&tagId=1&productId=ST-01", List.of(new Card().setId("ST01-001"), new Card().setId("ST01-012"), new Card().setId("ST01-013"))),
-                Arguments.of("page=0&size=10&rarity=SR", List.of(new Card().setId("ST01-012"), new Card().setId("ST01-013"), new Card().setId("ST02-009"), new Card().setId("ST02-013"))),
-                Arguments.of("page=0&size=10&keyword=Counter", List.of(new Card().setId("ST01-014"), new Card().setId("ST02-015"), new Card().setId("ST02-016"))),
-                Arguments.of("page=0&size=10&keyword=rush !luffy", List.of(new Card().setId("ST01-004"))),
-                Arguments.of("page=0&size=10&cost=7&cost=5", List.of(new Card().setId("ST01-012"), new Card().setId("ST02-009"), new Card().setId("ST02-010"), new Card().setId("ST02-013")))
+                Arguments.of(
+                        CollectionUtils.toMultiValueMap(
+                                Map.of("page", List.of("0"), "size", List.of("10"), "power", List.of("6000"))),
+                        List.of(new Card().setId("ST01-010"), new Card().setId("ST01-012"), new Card().setId("ST02-006"), new Card().setId("ST02-009"), new Card().setId("ST02-010"))),
+                Arguments.of(
+                        CollectionUtils.toMultiValueMap(
+                                Map.of("page", List.of("0"), "size", List.of("10"), "type", List.of("LEADER"), "color", List.of("RED"))),
+                        List.of(new Card().setId("ST01-001"))),
+                Arguments.of(
+                        CollectionUtils.toMultiValueMap(
+                                Map.of("page", List.of("0"), "size", List.of("10"), "tagId", List.of("1"), "productId", List.of("ST-01"))),
+                        List.of(new Card().setId("ST01-001"), new Card().setId("ST01-012"), new Card().setId("ST01-013"))),
+                Arguments.of(
+                        CollectionUtils.toMultiValueMap(
+                                Map.of("page", List.of("0"), "size", List.of("10"), "rarity", List.of("SR"))),
+                        List.of(new Card().setId("ST01-012"), new Card().setId("ST01-013"), new Card().setId("ST02-009"), new Card().setId("ST02-013"))),
+                Arguments.of(
+                        CollectionUtils.toMultiValueMap(
+                                Map.of("page", List.of("0"), "size", List.of("10"), "keyword", List.of("Counter"))),
+                        List.of(new Card().setId("ST01-014"), new Card().setId("ST02-015"), new Card().setId("ST02-016"))),
+                Arguments.of(
+                        CollectionUtils.toMultiValueMap(
+                                Map.of("page", List.of("0"), "size", List.of("10"), "keyword", List.of("rush !luffy"))),
+                        List.of(new Card().setId("ST01-004"))),
+                Arguments.of(
+                        CollectionUtils.toMultiValueMap(
+                                Map.of("page", List.of("0"), "size", List.of("10"), "cost", List.of("7", "5"))),
+                        List.of(new Card().setId("ST01-012"), new Card().setId("ST02-009"), new Card().setId("ST02-010"), new Card().setId("ST02-013")))
         );
     }
 

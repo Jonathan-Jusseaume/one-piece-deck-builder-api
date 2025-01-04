@@ -5,6 +5,7 @@ import com.onepiecedeckbuilder.dto.Color;
 import com.onepiecedeckbuilder.dto.Rarity;
 import com.onepiecedeckbuilder.dto.Type;
 import com.onepiecedeckbuilder.entity.CardEntity;
+import com.onepiecedeckbuilder.mapper.CardMapper;
 import com.onepiecedeckbuilder.repository.CardRepository;
 import com.onepiecedeckbuilder.repository.specification.CardSpecification;
 import com.onepiecedeckbuilder.repository.specification.SpecificationBuilder;
@@ -26,6 +27,8 @@ import java.util.function.Function;
 public class CardService {
 
     private final CardRepository cardRepository;
+
+    private final CardMapper cardMapper;
 
     public Page<Card> list(Pageable pageable,
                            Set<Type> types,
@@ -54,7 +57,7 @@ public class CardService {
         Page<CardEntity> results = cardRepository.findAll(builder.build(), pageable);
         List<Card> cards = results.getContent()
                 .stream()
-                .map(cardEntity -> new Card(cardEntity, languageCode))
+                .map(cardEntity -> cardMapper.toDto(cardEntity, languageCode))
                 .toList();
 
         return new PageImpl<>(cards, pageable, results.getTotalElements());

@@ -17,7 +17,7 @@ import lombok.experimental.Accessors;
 @NoArgsConstructor
 @EqualsAndHashCode
 @Schema(description = "Represents a tag with an identifier and a label, used to categorize cards.")
-public class Tag implements Comparable<Tag> {
+public class Tag {
     @Schema(description = "Unique identifier for the tag", example = "1")
     private Long id;
     @Schema(description = "The label of the tag", example = "Straw Hat Crew")
@@ -31,10 +31,5 @@ public class Tag implements Comparable<Tag> {
                 break;
             }
         }
-    }
-
-    @Override
-    public int compareTo(Tag o) {
-        return this.getLabel().compareTo(o.getLabel());
     }
 }

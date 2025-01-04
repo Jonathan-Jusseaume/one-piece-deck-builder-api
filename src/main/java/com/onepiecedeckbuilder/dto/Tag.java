@@ -1,8 +1,6 @@
 package com.onepiecedeckbuilder.dto;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.onepiecedeckbuilder.entity.TagDescriptionEntity;
-import com.onepiecedeckbuilder.entity.TagEntity;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -22,14 +20,4 @@ public class Tag {
     private Long id;
     @Schema(description = "The label of the tag", example = "Straw Hat Crew")
     private String label;
-
-    public Tag(TagEntity tagEntity, String languageCode) {
-        this.id = tagEntity.getId();
-        for (TagDescriptionEntity description : tagEntity.getDescriptions()) {
-            if (description.getLanguageCode().equals(languageCode)) {
-                this.label = description.getName();
-                break;
-            }
-        }
-    }
 }

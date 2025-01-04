@@ -2,6 +2,7 @@ package com.onepiecedeckbuilder.mapper;
 
 import com.onepiecedeckbuilder.dto.CardImage;
 import com.onepiecedeckbuilder.entity.CardImageEntity;
+import com.onepiecedeckbuilder.mapper.context.CustomMapperContext;
 import org.mapstruct.Context;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -11,6 +12,6 @@ import org.mapstruct.MappingConstants;
 public interface CardImageMapper {
 
     @Mapping(target = "filename", source = "name")
-    CardImage toDto(CardImageEntity cardImageEntity, @Context String languageCode);
+    CardImage toDto(CardImageEntity cardImageEntity, @Context CustomMapperContext mapperContext);
 
 }

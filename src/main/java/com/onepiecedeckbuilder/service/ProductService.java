@@ -2,6 +2,7 @@ package com.onepiecedeckbuilder.service;
 
 import com.onepiecedeckbuilder.dto.Product;
 import com.onepiecedeckbuilder.mapper.ProductMapper;
+import com.onepiecedeckbuilder.mapper.context.CustomMapperContext;
 import com.onepiecedeckbuilder.repository.ProductRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +23,7 @@ public class ProductService {
     public List<Product> list(String languageCode) {
         return productRepository.findAll()
                 .stream()
-                .map(productEntity -> productMapper.toDto(productEntity, languageCode))
+                .map(productEntity -> productMapper.toDto(productEntity, new CustomMapperContext().setLanguageCode(languageCode)))
                 .sorted(Comparator.comparing(Product::getLabel))
                 .toList();
     }

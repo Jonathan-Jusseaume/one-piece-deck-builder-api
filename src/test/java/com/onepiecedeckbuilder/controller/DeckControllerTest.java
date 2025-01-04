@@ -167,7 +167,7 @@ class DeckControllerTest {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
         Deck actualDeck = objectMapper.readValue(jsonResponse, Deck.class);
-
+        System.out.println(actualDeck.toString());
         assertThat(actualDeck.getId()).isEqualTo(UUID.fromString(searchedDeckID));
         assertThat(actualDeck.getCards()).hasSize(50);
     }

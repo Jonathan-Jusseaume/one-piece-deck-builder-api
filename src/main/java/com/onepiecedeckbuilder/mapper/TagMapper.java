@@ -3,6 +3,7 @@ package com.onepiecedeckbuilder.mapper;
 import com.onepiecedeckbuilder.dto.Tag;
 import com.onepiecedeckbuilder.entity.TagDescriptionEntity;
 import com.onepiecedeckbuilder.entity.TagEntity;
+import com.onepiecedeckbuilder.mapper.context.CustomMapperContext;
 import org.mapstruct.*;
 
 import java.util.Set;
@@ -11,12 +12,12 @@ import java.util.Set;
 public interface TagMapper {
 
     @Mapping(target = "label", source = "descriptions", qualifiedByName = "tagLabelMatchingLanguage")
-    Tag toDto(TagEntity tagEntity, @Context String languageCode);
+    Tag toDto(TagEntity tagEntity, @Context CustomMapperContext customMapperContext);
 
     @Named("tagLabelMatchingLanguage")
-    default String getLabel(Set<TagDescriptionEntity> descriptionEntities, @Context String languageCode) {
+    default String getLabel(Set<TagDescriptionEntity> descriptionEntities, @Context CustomMapperContext customMapperContext) {
         return descriptionEntities.stream()
-                .filter(description -> languageCode.equals(description.getLanguageCode()))
+                .filter(description -> customMapperContext.getLanguageCode().equals(description.getLanguageCode()))
                 .map(TagDescriptionEntity::getName)
                 .findFirst()
                 .orElse(null);

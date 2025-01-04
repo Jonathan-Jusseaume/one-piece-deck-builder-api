@@ -6,6 +6,7 @@ import com.onepiecedeckbuilder.dto.Rarity;
 import com.onepiecedeckbuilder.dto.Type;
 import com.onepiecedeckbuilder.entity.CardEntity;
 import com.onepiecedeckbuilder.mapper.CardMapper;
+import com.onepiecedeckbuilder.mapper.context.CustomMapperContext;
 import com.onepiecedeckbuilder.repository.CardRepository;
 import com.onepiecedeckbuilder.repository.specification.CardSpecification;
 import com.onepiecedeckbuilder.repository.specification.SpecificationBuilder;
@@ -57,7 +58,7 @@ public class CardService {
         Page<CardEntity> results = cardRepository.findAll(builder.build(), pageable);
         List<Card> cards = results.getContent()
                 .stream()
-                .map(cardEntity -> cardMapper.toDto(cardEntity, languageCode))
+                .map(cardEntity -> cardMapper.toDto(cardEntity, new CustomMapperContext().setLanguageCode(languageCode)))
                 .toList();
 
         return new PageImpl<>(cards, pageable, results.getTotalElements());

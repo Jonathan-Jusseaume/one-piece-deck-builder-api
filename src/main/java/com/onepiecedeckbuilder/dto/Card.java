@@ -1,7 +1,5 @@
 package com.onepiecedeckbuilder.dto;
 
-import com.onepiecedeckbuilder.entity.CardDescriptionEntity;
-import com.onepiecedeckbuilder.entity.CardEntity;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -28,42 +26,17 @@ public class Card {
     private Attribute attribute;
     @Schema(description = "The label or name of the card")
     private String label;
-    @Schema(description = "Effect or description of the card's ability")
+    @Schema(description = "Effect or description of the card's ability", nullable = true)
     private String effect;
-    @Schema(description = "Cost to play the card", example = "5")
+    @Schema(description = "Cost to play the card", example = "5", nullable = true)
     private Integer cost;
-    @Schema(description = "Power of the card", example = "3000")
+    @Schema(description = "Power of the card", example = "3000", nullable = true)
     private Integer power;
-    @Schema(description = "Life of the card", example = "5")
+    @Schema(description = "Life of the card", example = "5", nullable = true)
     private Integer life;
-    @Schema(description = "Counter for the card", example = "1000")
+    @Schema(description = "Counter for the card", example = "1000", nullable = true)
     private Integer counter;
     @Schema(description = "List of images associated with the card")
     private List<CardImage> images;
-
-    public Card(CardEntity cardEntity, String languageCode) {
-        this.id = cardEntity.getId();
-        this.type = cardEntity.getType();
-        this.attribute = cardEntity.getAttribute();
-        this.cost = cardEntity.getCost();
-        this.counter = cardEntity.getCounter();
-        this.life = cardEntity.getLife();
-        this.images = cardEntity.getImages().stream().map(cardImageEntity -> new CardImage(cardImageEntity, languageCode))
-                .sorted()
-                .toList();
-        this.power = cardEntity.getPower();
-        this.colors = cardEntity.getColors();
-        this.tags = cardEntity.getTags()
-                .stream()
-                .map(tagEntity -> new Tag(tagEntity, languageCode))
-                .sorted()
-                .toList();
-        for (CardDescriptionEntity description : cardEntity.getDescriptions()) {
-            if (description.getLanguageCode().equals(languageCode)) {
-                this.label = description.getName();
-                this.effect = description.getEffect();
-            }
-        }
-    }
 
 }

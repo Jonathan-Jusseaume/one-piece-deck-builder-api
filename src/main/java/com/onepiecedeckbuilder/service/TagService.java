@@ -2,6 +2,7 @@ package com.onepiecedeckbuilder.service;
 
 import com.onepiecedeckbuilder.dto.Tag;
 import com.onepiecedeckbuilder.mapper.TagMapper;
+import com.onepiecedeckbuilder.mapper.context.CustomMapperContext;
 import com.onepiecedeckbuilder.repository.TagRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +23,7 @@ public class TagService {
     public List<Tag> list(String languageCode) {
         return tagRepository.findAll()
                 .stream()
-                .map(tagEntity -> new Tag(tagEntity, languageCode))
+                .map(tagEntity -> tagMapper.toDto(tagEntity, new CustomMapperContext().setLanguageCode(languageCode)))
                 .sorted(Comparator.comparing(Tag::getLabel))
                 .toList();
     }

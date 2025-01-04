@@ -10,14 +10,11 @@ import java.util.Set;
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
 public interface TagMapper {
 
-    @Mapping(target = "label", source = "descriptions", qualifiedByName = "labelMatchingLanguage")
+    @Mapping(target = "label", source = "descriptions", qualifiedByName = "tagLabelMatchingLanguage")
     Tag toDto(TagEntity tagEntity, @Context String languageCode);
 
-    @Named("labelMatchingLanguage")
+    @Named("tagLabelMatchingLanguage")
     default String getLabel(Set<TagDescriptionEntity> descriptionEntities, @Context String languageCode) {
-        if (descriptionEntities == null || languageCode == null) {
-            return null;
-        }
         return descriptionEntities.stream()
                 .filter(description -> languageCode.equals(description.getLanguageCode()))
                 .map(TagDescriptionEntity::getName)

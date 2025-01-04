@@ -19,7 +19,7 @@ import java.time.ZoneOffset;
 @NoArgsConstructor
 @EqualsAndHashCode
 @Schema(description = "Represents a product with an identifier, release date, and label.")
-public class Product implements Comparable<Product> {
+public class Product {
     @Schema(description = "Unique identifier for the product", example = "OP01")
     private String id;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "UTC")
@@ -39,8 +39,4 @@ public class Product implements Comparable<Product> {
         }
     }
 
-    @Override
-    public int compareTo(Product o) {
-        return this.label.compareTo(o.getLabel());
-    }
 }

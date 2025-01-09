@@ -61,7 +61,7 @@ public class CardSpecification {
 
     public static Specification<CardEntity> byType(Set<Type> types) {
         return (root, criteriaQuery, criteriaBuilder) -> criteriaBuilder
-                .in(root.get("type"))
+                .in(root.get(CardEntity_.TYPE))
                 .value(types);
     }
 
@@ -74,8 +74,8 @@ public class CardSpecification {
 
     public static Specification<CardEntity> byTagId(Set<Long> tagsId) {
         return ((root, criteriaQuery, criteriaBuilder) -> {
-            SetJoin<CardEntity, TagEntity> join = root.joinSet("tags");
-            return join.get("id").in(tagsId);
+            SetJoin<CardEntity, TagEntity> join = root.joinSet(CardEntity_.TAGS);
+            return join.get(TagEntity_.ID).in(tagsId);
         });
     }
 
@@ -89,8 +89,8 @@ public class CardSpecification {
     public static Specification<CardEntity> byCost(Set<Integer> costs) {
         return ((root, criteriaQuery, criteriaBuilder) ->
                 criteriaBuilder.and(
-                        criteriaBuilder.isNotNull(root.get("cost")),
-                        criteriaBuilder.in(root.get("cost")).value(costs)));
+                        criteriaBuilder.isNotNull(root.get(CardEntity_.COST)),
+                        criteriaBuilder.in(root.get(CardEntity_.COST)).value(costs)));
     }
 
 

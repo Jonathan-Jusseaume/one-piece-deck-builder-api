@@ -17,6 +17,7 @@
     <properties>
         <java.version>21</java.version>
         <h2.version>2.2.224</h2.version>
+        <hibernate-processor.version>7.0.0.Beta3</hibernate-processor.version>
         <junit.version>5.9.1</junit.version>
         <jwt.version>0.12.6</jwt.version>
         <lombok.version>1.18.36</lombok.version>
@@ -93,6 +94,12 @@
             <artifactId>mapstruct-processor</artifactId>
             <version>${mapstruct.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.hibernate.orm</groupId>
+            <artifactId>hibernate-processor</artifactId>
+            <version>${hibernate-processor.version}</version>
+        </dependency>
+
         <!-- # UTILITY -->
 
         <!-- TEST -->
@@ -169,6 +176,11 @@
                             <groupId>org.projectlombok</groupId>
                             <artifactId>lombok-mapstruct-binding</artifactId>
                             <version>${lombok-mapstruct.version}</version>
+                        </path>
+                        <path>
+                            <groupId>org.hibernate.orm</groupId>
+                            <artifactId>hibernate-processor</artifactId>
+                            <version>${hibernate-processor.version}</version>
                         </path>
                     </annotationProcessorPaths>
                 </configuration>

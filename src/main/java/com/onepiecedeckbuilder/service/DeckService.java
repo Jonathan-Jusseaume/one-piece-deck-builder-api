@@ -61,10 +61,12 @@ public class DeckService {
         return new PageImpl<>(
                 results.getContent()
                         .stream()
-                        .map(deckEntity -> deckMapper.toDto(deckEntity, new CustomMapperContext()
-                                .setLanguageCode(language)
-                                .setMinimizeData(true)
-                                .setConnectedUser((connectedUser != null) ? connectedUser.getMail() : null))
+                        .map(deckEntity -> deckMapper.toDto(deckEntity,
+                                CustomMapperContext.builder()
+                                        .languageCode(language)
+                                        .minimizeData(true)
+                                        .connectedUser((connectedUser != null) ? connectedUser.getMail() : null)
+                                        .build())
                         )
                         .toList(),
                 pageable, results.getTotalElements());
@@ -72,9 +74,10 @@ public class DeckService {
 
     public Deck read(UUID id, String language, String mail) throws DeckNotFoundException {
         return this.deckMapper.toDto(this.readById(id),
-                new CustomMapperContext()
-                        .setLanguageCode(language)
-                        .setConnectedUser(mail));
+                CustomMapperContext.builder()
+                        .languageCode(language)
+                        .connectedUser(mail)
+                        .build());
     }
 
     public Deck create(Deck deck, String language) throws DeckInvalidException, UserUnauthorizedException {
@@ -89,9 +92,10 @@ public class DeckService {
         deck.setUser(new User(userToSave));
         deck.setCreationDate(LocalDate.now(ZoneOffset.UTC));
         return deckMapper.toDto(deckRepository.save(deck.toEntity()),
-                new CustomMapperContext()
-                        .setLanguageCode(language)
-                        .setConnectedUser(userToSave.getMail()));
+                CustomMapperContext.builder()
+                        .languageCode(language)
+                        .connectedUser(userToSave.getMail())
+                        .build());
     }
 
     public Deck favorite(UUID id, User connectedUser, String language) throws DeckNotFoundException, DeckAlreadyFavoritedException, DeckNotFavoritedException {
@@ -123,10 +127,11 @@ public class DeckService {
             deckEntity.setCountFavorites(deckEntity.getCountFavorites() - 1);
         }
         return deckMapper.toDto(deckRepository.save(deckEntity),
-                new CustomMapperContext()
-                        .setLanguageCode(language)
-                        .setConnectedUser(userToSave.getMail())
-                        .setMinimizeData(true));
+                CustomMapperContext.builder()
+                        .languageCode(language)
+                        .connectedUser(userToSave.getMail())
+                        .minimizeData(true)
+                        .build());
     }
 
     public void delete(UUID id, User user) throws DeckOwnershipException, DeckNotFoundException {

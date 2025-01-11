@@ -1,12 +1,10 @@
 package com.onepiecedeckbuilder.mapper.context;
 
 import lombok.Getter;
-import lombok.Setter;
-import lombok.experimental.Accessors;
+import lombok.experimental.SuperBuilder;
 
 @Getter
-@Setter
-@Accessors(chain = true)
+@SuperBuilder
 public class CustomMapperContext {
     private String languageCode;
     private String connectedUser;

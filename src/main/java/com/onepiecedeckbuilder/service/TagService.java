@@ -23,7 +23,10 @@ public class TagService {
     public List<Tag> list(String languageCode) {
         return tagRepository.findAll()
                 .stream()
-                .map(tagEntity -> tagMapper.toDto(tagEntity, new CustomMapperContext().setLanguageCode(languageCode)))
+                .map(tagEntity -> tagMapper.toDto(tagEntity, CustomMapperContext
+                        .builder()
+                        .languageCode(languageCode)
+                        .build()))
                 .sorted(Comparator.comparing(Tag::getLabel))
                 .toList();
     }

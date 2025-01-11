@@ -58,7 +58,10 @@ public class CardService {
         Page<CardEntity> results = cardRepository.findAll(builder.build(), pageable);
         List<Card> cards = results.getContent()
                 .stream()
-                .map(cardEntity -> cardMapper.toDto(cardEntity, new CustomMapperContext().setLanguageCode(languageCode)))
+                .map(cardEntity -> cardMapper.toDto(cardEntity, CustomMapperContext
+                        .builder()
+                        .languageCode(languageCode)
+                        .build()))
                 .toList();
 
         return new PageImpl<>(cards, pageable, results.getTotalElements());

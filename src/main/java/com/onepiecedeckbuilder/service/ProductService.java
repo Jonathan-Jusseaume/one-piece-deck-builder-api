@@ -23,7 +23,11 @@ public class ProductService {
     public List<Product> list(String languageCode) {
         return productRepository.findAll()
                 .stream()
-                .map(productEntity -> productMapper.toDto(productEntity, new CustomMapperContext().setLanguageCode(languageCode)))
+                .map(productEntity -> productMapper.toDto(productEntity,
+                        CustomMapperContext
+                                .builder()
+                                .languageCode(languageCode)
+                                .build()))
                 .sorted(Comparator.comparing(Product::getLabel))
                 .toList();
     }

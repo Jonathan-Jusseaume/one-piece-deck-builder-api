@@ -15,8 +15,6 @@ import java.util.Set;
 @UtilityClass
 public class CardSpecification {
 
-    private static final String EFFECT_FIELD = "effect";
-
     public static Specification<CardEntity> distinct() {
         return (root, query, cb) -> {
             query.distinct(true);
@@ -26,7 +24,7 @@ public class CardSpecification {
 
     public static Specification<CardEntity> byKeyword(String keyword) {
         return ((root, criteriaQuery, criteriaBuilder) -> {
-            SetJoin<CardEntity, CardDescriptionEntity> join = root.joinSet("descriptions");
+            SetJoin<CardEntity, CardDescriptionEntity> join = root.joinSet(CardEntity_.DESCRIPTIONS);
             Predicate predicate = null;
             for (String word : keyword.split(" ")) {
                 Predicate predicateWord;
@@ -34,9 +32,9 @@ public class CardSpecification {
                     predicateWord =
                             criteriaBuilder.and(
                                     criteriaBuilder.or(
-                                            criteriaBuilder.isNull(join.get(EFFECT_FIELD))
+                                            criteriaBuilder.isNull(join.get(CardDescriptionEntity_.EFFECT))
                                             , criteriaBuilder.not(
-                                                    criteriaBuilder.like(criteriaBuilder.lower(join.get(EFFECT_FIELD)),
+                                                    criteriaBuilder.like(criteriaBuilder.lower(join.get(CardDescriptionEntity_.EFFECT)),
                                                             "%" + word.substring(1).toLowerCase() + "%")
                                             )
                                     ),
@@ -45,8 +43,8 @@ public class CardSpecification {
                 } else {
                     predicateWord =
                             criteriaBuilder.or(
-                                    criteriaBuilder.like(criteriaBuilder.lower(join.get(EFFECT_FIELD)), "%" + word.toLowerCase() + "%"),
-                                    criteriaBuilder.like(criteriaBuilder.lower(join.get("name")), "%" + word.toLowerCase() + "%"));
+                                    criteriaBuilder.like(criteriaBuilder.lower(join.get(CardDescriptionEntity_.EFFECT)), "%" + word.toLowerCase() + "%"),
+                                    criteriaBuilder.like(criteriaBuilder.lower(join.get(CardDescriptionEntity_.NAME)), "%" + word.toLowerCase() + "%"));
                 }
 
                 if (predicate != null) {
@@ -67,7 +65,7 @@ public class CardSpecification {
 
     public static Specification<CardEntity> byColor(Set<Color> colors) {
         return ((root, criteriaQuery, criteriaBuilder) -> {
-            Join<CardEntity, Color> colorsJoin = root.join("colors");
+            Join<CardEntity, Color> colorsJoin = root.join(CardEntity_.COLORS);
             return colorsJoin.in(colors);
         });
     }
@@ -81,7 +79,7 @@ public class CardSpecification {
 
     public static Specification<CardEntity> byRarity(Set<Rarity> rarities) {
         return ((root, criteriaQuery, criteriaBuilder) -> {
-            SetJoin<CardEntity, CardImageEntity> join = root.joinSet("images");
+            SetJoin<CardEntity, CardImageEntity> join = root.joinSet(CardEntity_.IMAGES);
             return join.get("rarity").in(rarities);
         });
     }
@@ -97,14 +95,14 @@ public class CardSpecification {
     public static Specification<CardEntity> byPower(Set<Integer> powers) {
         return ((root, criteriaQuery, criteriaBuilder) ->
                 criteriaBuilder.and(
-                        criteriaBuilder.isNotNull(root.get("power")),
-                        criteriaBuilder.in(root.get("power")).value(powers)));
+                        criteriaBuilder.isNotNull(root.get(CardEntity_.POWER)),
+                        criteriaBuilder.in(root.get(CardEntity_.POWER)).value(powers)));
     }
 
     public static Specification<CardEntity> byProductId(Set<String> productsId) {
         return ((root, criteriaQuery, criteriaBuilder) -> {
-            SetJoin<CardEntity, CardImageEntity> join = root.joinSet("images");
-            return join.get("product").get("id").in(productsId);
+            SetJoin<CardEntity, CardImageEntity> join = root.joinSet(CardEntity_.IMAGES);
+            return join.get(CardImageEntity_.PRODUCT).get(ProductEntity_.ID).in(productsId);
         });
     }
 }

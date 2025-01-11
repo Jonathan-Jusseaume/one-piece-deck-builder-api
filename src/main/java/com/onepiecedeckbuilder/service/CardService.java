@@ -1,20 +1,17 @@
 package com.onepiecedeckbuilder.service;
 
 import com.onepiecedeckbuilder.dto.Card;
-import com.onepiecedeckbuilder.dto.Color;
-import com.onepiecedeckbuilder.dto.Rarity;
-import com.onepiecedeckbuilder.dto.Type;
 import com.onepiecedeckbuilder.entity.CardEntity;
 import com.onepiecedeckbuilder.mapper.CardMapper;
 import com.onepiecedeckbuilder.mapper.context.CustomMapperContext;
 import com.onepiecedeckbuilder.repository.CardRepository;
+import com.onepiecedeckbuilder.repository.search.CardSearch;
 import com.onepiecedeckbuilder.repository.specification.CardSpecification;
 import com.onepiecedeckbuilder.repository.specification.SpecificationBuilder;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
@@ -31,31 +28,13 @@ public class CardService {
 
     private final CardMapper cardMapper;
 
-    public Page<Card> list(Pageable pageable,
-                           Set<Type> types,
-                           Set<Color> colors,
-                           Set<Long> tagsId,
-                           Set<Rarity> rarities,
-                           Set<String> productsId,
-                           Set<Integer> costs,
-                           Set<Integer> powers,
-                           String keyword,
+    public Page<Card> list(CardSearch cardSearch,
                            String languageCode) {
-        pageable = pageable != null ? pageable : Pageable.ofSize(25);
+        Page<CardEntity> results = cardRepository.findAll(
+                convertCardSearchToSpecification(cardSearch),
+                cardSearch.getPageable()
+        );
 
-        SpecificationBuilder<CardEntity> builder = new SpecificationBuilder<>();
-        builder.with(CardSpecification.distinct());
-
-        addToFilter(builder, types, CardSpecification::byType);
-        addToFilter(builder, colors, CardSpecification::byColor);
-        addToFilter(builder, tagsId, CardSpecification::byTagId);
-        addToFilter(builder, rarities, CardSpecification::byRarity);
-        addToFilter(builder, productsId, CardSpecification::byProductId);
-        addToFilter(builder, costs, CardSpecification::byCost);
-        addToFilter(builder, powers, CardSpecification::byPower);
-        addKeywordToFilter(builder, keyword);
-
-        Page<CardEntity> results = cardRepository.findAll(builder.build(), pageable);
         List<Card> cards = results.getContent()
                 .stream()
                 .map(cardEntity -> cardMapper.toDto(cardEntity, CustomMapperContext
@@ -64,7 +43,22 @@ public class CardService {
                         .build()))
                 .toList();
 
-        return new PageImpl<>(cards, pageable, results.getTotalElements());
+        return new PageImpl<>(cards, cardSearch.getPageable(), results.getTotalElements());
+    }
+
+    private Specification<CardEntity> convertCardSearchToSpecification(CardSearch cardSearch) {
+        SpecificationBuilder<CardEntity> builder = new SpecificationBuilder<>();
+        builder.with(CardSpecification.distinct());
+
+        addToFilter(builder, cardSearch.getTypes(), CardSpecification::byType);
+        addToFilter(builder, cardSearch.getColors(), CardSpecification::byColor);
+        addToFilter(builder, cardSearch.getTagsId(), CardSpecification::byTagId);
+        addToFilter(builder, cardSearch.getRarities(), CardSpecification::byRarity);
+        addToFilter(builder, cardSearch.getProductsId(), CardSpecification::byProductId);
+        addToFilter(builder, cardSearch.getCosts(), CardSpecification::byCost);
+        addToFilter(builder, cardSearch.getPowers(), CardSpecification::byPower);
+        addKeywordToFilter(builder, cardSearch.getKeyword());
+        return builder.build();
     }
 
     private <T> void addToFilter(SpecificationBuilder<CardEntity> builder, Set<T> criteria, Function<Set<T>, Specification<CardEntity>> specFunction) {

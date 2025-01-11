@@ -10,13 +10,14 @@ import com.onepiecedeckbuilder.mapper.UserMapper;
 import com.onepiecedeckbuilder.mapper.context.CustomMapperContext;
 import com.onepiecedeckbuilder.repository.CardRepository;
 import com.onepiecedeckbuilder.repository.DeckRepository;
+import com.onepiecedeckbuilder.repository.search.DeckSearch;
 import com.onepiecedeckbuilder.repository.specification.DeckSpecification;
 import com.onepiecedeckbuilder.repository.specification.SpecificationBuilder;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -45,23 +46,16 @@ public class DeckService {
 
     private final UserMapper userMapper;
 
-    public Page<Deck> list(Pageable pageable, boolean onlyUserDeck, Set<Color> colors, String keyword,
-                           boolean onlyFavorite, String language) throws UserUnauthorizedException {
+    public Page<Deck> list(DeckSearch deckSearch, String language) throws UserUnauthorizedException {
         User connectedUser = userService.getConnectedUser();
-        if ((onlyFavorite || onlyUserDeck) && connectedUser == null) {
+        if ((deckSearch.getOnlyFavorite() || deckSearch.getOnlyUserDeck()) && connectedUser == null) {
             throw new UserUnauthorizedException();
         }
-        if (pageable == null) {
-            pageable = Pageable.ofSize(25);
-        }
 
-        SpecificationBuilder<DeckEntity> builder = new SpecificationBuilder<>();
-        builder.with(DeckSpecification.distinct());
-        addMailToFilter(builder, connectedUser, onlyUserDeck);
-        addColorsToFilter(builder, colors);
-        addKeywordToFilter(builder, keyword);
-        addOnlyFavoriteToFilter(builder, connectedUser, onlyFavorite);
-        Page<DeckEntity> results = deckRepository.findAll(builder.build(), pageable);
+        Page<DeckEntity> results = deckRepository.findAll(
+                convertDeckSearchToSpecifications(deckSearch, connectedUser),
+                deckSearch.getPageable()
+        );
         return new PageImpl<>(
                 results.getContent()
                         .stream()
@@ -73,7 +67,17 @@ public class DeckService {
                                         .build())
                         )
                         .toList(),
-                pageable, results.getTotalElements());
+                deckSearch.getPageable(), results.getTotalElements());
+    }
+
+    private Specification<DeckEntity> convertDeckSearchToSpecifications(DeckSearch deckSearch, User connectedUser) {
+        SpecificationBuilder<DeckEntity> builder = new SpecificationBuilder<>();
+        builder.with(DeckSpecification.distinct());
+        addMailToFilter(builder, connectedUser, deckSearch.getOnlyUserDeck());
+        addColorsToFilter(builder, deckSearch.getColors());
+        addKeywordToFilter(builder, deckSearch.getKeyword());
+        addOnlyFavoriteToFilter(builder, connectedUser, deckSearch.getOnlyFavorite());
+        return builder.build();
     }
 
     public Deck read(UUID id, String language) throws DeckNotFoundException {

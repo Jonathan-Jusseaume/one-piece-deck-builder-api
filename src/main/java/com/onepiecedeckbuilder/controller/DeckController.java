@@ -3,6 +3,7 @@ package com.onepiecedeckbuilder.controller;
 import com.onepiecedeckbuilder.dto.Color;
 import com.onepiecedeckbuilder.dto.Deck;
 import com.onepiecedeckbuilder.exceptions.*;
+import com.onepiecedeckbuilder.repository.search.DeckSearch;
 import com.onepiecedeckbuilder.service.DeckService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -51,8 +52,16 @@ public class DeckController {
             @Parameter(name = "onlyUserDeck",
                     description = "If the boolean value is true, it will return only the deck created by the user connected")
             Boolean onlyUserDeck) throws UserUnauthorizedException {
+        DeckSearch deckSearch = DeckSearch.builder()
+                .onlyUserDeck(onlyUserDeck)
+                .onlyFavorite(onlyFavorite)
+                .colors(colors)
+                .keyword(keyword)
+                .pageable(pageable)
+                .build();
+
         return deckService.list(
-                pageable, onlyUserDeck, colors, keyword, onlyFavorite,
+                deckSearch,
                 LocaleContextHolder.getLocale().getLanguage()
         );
     }

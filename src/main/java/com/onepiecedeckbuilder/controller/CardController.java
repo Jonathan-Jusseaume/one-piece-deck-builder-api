@@ -4,6 +4,7 @@ import com.onepiecedeckbuilder.dto.Card;
 import com.onepiecedeckbuilder.dto.Color;
 import com.onepiecedeckbuilder.dto.Rarity;
 import com.onepiecedeckbuilder.dto.Type;
+import com.onepiecedeckbuilder.repository.search.CardSearch;
 import com.onepiecedeckbuilder.service.CardService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -66,16 +67,22 @@ public class CardController {
                     description = "Keywords which are in the card name or the card description. You can prefix them with \"!\" " +
                             "in order to search cards which don't have this word.")
             String keyword) {
-        return cardService.list(pageable,
-                types,
-                colors,
-                tagsId,
-                rarities,
-                productsId,
-                costs,
-                powers,
-                keyword,
-                LocaleContextHolder.getLocale().getLanguage());
+        CardSearch cardSearch = CardSearch.builder()
+                .pageable(pageable)
+                .colors(colors)
+                .keyword(keyword)
+                .types(types)
+                .tagsId(tagsId)
+                .rarities(rarities)
+                .productsId(productsId)
+                .costs(costs)
+                .powers(powers)
+                .build();
+
+        return cardService.list(
+                cardSearch,
+                LocaleContextHolder.getLocale().getLanguage()
+        );
     }
 
 

@@ -1,7 +1,6 @@
 package com.onepiecedeckbuilder.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.onepiecedeckbuilder.entity.CardEntity;
 import com.onepiecedeckbuilder.entity.DeckEntity;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -42,13 +41,10 @@ public class Deck {
     private Integer countFavorites = 0;
     @Schema(description = "Indicates if the deck is a favorite for the user who made the request", example = "true")
     private Boolean favorite = false;
-    @JsonIgnore
-    private User user;
 
     public DeckEntity toEntity() {
         return new DeckEntity()
                 .setId(id)
-                .setUser(user.toEntity())
                 .setCards(cards.stream()
                         .map(card -> new CardEntity()
                                 .setId(card.getId()))

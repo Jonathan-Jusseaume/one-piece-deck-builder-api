@@ -6,10 +6,10 @@ import com.onepiecedeckbuilder.entity.DeckEntity;
 import com.onepiecedeckbuilder.entity.UserEntity;
 import com.onepiecedeckbuilder.exceptions.*;
 import com.onepiecedeckbuilder.mapper.DeckMapper;
+import com.onepiecedeckbuilder.mapper.UserMapper;
 import com.onepiecedeckbuilder.mapper.context.CustomMapperContext;
 import com.onepiecedeckbuilder.repository.CardRepository;
 import com.onepiecedeckbuilder.repository.DeckRepository;
-import com.onepiecedeckbuilder.repository.UserRepository;
 import com.onepiecedeckbuilder.repository.specification.DeckSpecification;
 import com.onepiecedeckbuilder.repository.specification.SpecificationBuilder;
 import jakarta.transaction.Transactional;
@@ -35,22 +35,26 @@ public class DeckService {
     public static final int MAX_CARDS_IN_DECK = 50;
     public static final int MAX_COPIES_NUMBER_OF_CARD_PER_DECK = 4;
 
-    private final DeckRepository deckRepository;
+    private final UserService userService;
 
-    private final UserRepository userRepository;
+    private final DeckRepository deckRepository;
 
     private final CardRepository cardRepository;
 
     private final DeckMapper deckMapper;
 
-    public Page<Deck> list(Pageable pageable, boolean onlyUserDeck, Set<Color> colors, String keyword, User connectedUser,
+    private final UserMapper userMapper;
+
+    public Page<Deck> list(Pageable pageable, boolean onlyUserDeck, Set<Color> colors, String keyword,
                            boolean onlyFavorite, String language) throws UserUnauthorizedException {
+        User connectedUser = userService.getConnectedUser();
         if ((onlyFavorite || onlyUserDeck) && connectedUser == null) {
             throw new UserUnauthorizedException();
         }
         if (pageable == null) {
             pageable = Pageable.ofSize(25);
         }
+
         SpecificationBuilder<DeckEntity> builder = new SpecificationBuilder<>();
         builder.with(DeckSpecification.distinct());
         addMailToFilter(builder, connectedUser, onlyUserDeck);
@@ -65,18 +69,19 @@ public class DeckService {
                                 CustomMapperContext.builder()
                                         .languageCode(language)
                                         .minimizeData(true)
-                                        .connectedUser((connectedUser != null) ? connectedUser.getMail() : null)
+                                        .connectedUser(connectedUser)
                                         .build())
                         )
                         .toList(),
                 pageable, results.getTotalElements());
     }
 
-    public Deck read(UUID id, String language, String mail) throws DeckNotFoundException {
+    public Deck read(UUID id, String language) throws DeckNotFoundException {
+        User connectedUser = userService.getConnectedUser();
         return this.deckMapper.toDto(this.readById(id),
                 CustomMapperContext.builder()
                         .languageCode(language)
-                        .connectedUser(mail)
+                        .connectedUser(connectedUser)
                         .build());
     }
 
@@ -84,31 +89,32 @@ public class DeckService {
         if (!isDeckValid(deck)) {
             throw new DeckInvalidException();
         }
-        if (deck.getUser() == null) {
+        User connectedUser = userService.getConnectedUser();
+        if (connectedUser == null) {
             throw new UserUnauthorizedException();
         }
-        UserEntity userToSave = this.saveUserIfNotExists(deck.getUser());
+        userService.saveUserIfNotExists(connectedUser);
         deck.setId(UUID.randomUUID());
-        deck.setUser(new User(userToSave));
         deck.setCreationDate(LocalDate.now(ZoneOffset.UTC));
         return deckMapper.toDto(deckRepository.save(deck.toEntity()),
                 CustomMapperContext.builder()
                         .languageCode(language)
-                        .connectedUser(userToSave.getMail())
+                        .connectedUser(connectedUser)
                         .build());
     }
 
-    public Deck favorite(UUID id, User connectedUser, String language) throws DeckNotFoundException, DeckAlreadyFavoritedException, DeckNotFavoritedException {
-        return favoriteAction(id, connectedUser, language, true);
+    public Deck favorite(UUID id, String language) throws DeckNotFoundException, DeckAlreadyFavoritedException, DeckNotFavoritedException {
+        return favoriteAction(id, language, true);
     }
 
-    public Deck unfavorite(UUID id, User connectedUser, String language) throws DeckNotFoundException, DeckAlreadyFavoritedException, DeckNotFavoritedException {
-        return favoriteAction(id, connectedUser, language, false);
+    public Deck unfavorite(UUID id, String language) throws DeckNotFoundException, DeckAlreadyFavoritedException, DeckNotFavoritedException {
+        return favoriteAction(id, language, false);
     }
 
-    private Deck favoriteAction(UUID id, User connectedUser, String language, boolean makeFavorite) throws DeckNotFoundException, DeckAlreadyFavoritedException, DeckNotFavoritedException {
+    private Deck favoriteAction(UUID id, String language, boolean makeFavorite) throws DeckNotFoundException, DeckAlreadyFavoritedException, DeckNotFavoritedException {
         DeckEntity deckEntity = this.readById(id);
-        UserEntity userToSave = this.saveUserIfNotExists(connectedUser);
+        User connectedUser = userService.getConnectedUser();
+        UserEntity userToSave = userMapper.toEntity(userService.saveUserIfNotExists(connectedUser));
         if (deckEntity.isFavorite(userToSave.getMail()) && makeFavorite) {
             throw new DeckAlreadyFavoritedException();
         }
@@ -129,29 +135,23 @@ public class DeckService {
         return deckMapper.toDto(deckRepository.save(deckEntity),
                 CustomMapperContext.builder()
                         .languageCode(language)
-                        .connectedUser(userToSave.getMail())
+                        .connectedUser(connectedUser)
                         .minimizeData(true)
                         .build());
     }
 
-    public void delete(UUID id, User user) throws DeckOwnershipException, DeckNotFoundException {
+    public void delete(UUID id) throws DeckOwnershipException, DeckNotFoundException {
         Optional<DeckEntity> deckEntity = deckRepository.findById(id);
         if (deckEntity.isEmpty()) {
             throw new DeckNotFoundException();
         }
+        User user = userService.getConnectedUser();
         if (!deckEntity.get().getUser().getMail().equals(user.getMail())) {
             throw new DeckOwnershipException();
         }
         this.deckRepository.deleteById(id);
     }
 
-    private UserEntity saveUserIfNotExists(User user) {
-        Optional<UserEntity> optionalUserEntity = userRepository.findById(user.getMail());
-        return optionalUserEntity.orElseGet(() -> {
-            user.setCreationDate(LocalDate.now(ZoneOffset.UTC));
-            return userRepository.saveAndFlush(user.toEntity());
-        });
-    }
 
     private DeckEntity readById(UUID id) throws DeckNotFoundException {
         Optional<DeckEntity> deckEntity = deckRepository.findById(id);

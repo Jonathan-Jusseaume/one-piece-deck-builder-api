@@ -14,7 +14,10 @@ public interface DeckMapper {
 
     @Named("fillFavoriteAccordingToConnectedUser")
     default boolean getIsFavoriteAccordingTonConnectedUser(DeckEntity deckEntity, @Context CustomMapperContext mapperContext) {
-        return deckEntity.isFavorite(mapperContext.getConnectedUser());
+        if (mapperContext.getConnectedUser() == null) {
+            return false;
+        }
+        return deckEntity.isFavorite(mapperContext.getConnectedUser().getMail());
     }
 
     @AfterMapping

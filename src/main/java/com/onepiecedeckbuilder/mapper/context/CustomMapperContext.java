@@ -1,5 +1,6 @@
 package com.onepiecedeckbuilder.mapper.context;
 
+import com.onepiecedeckbuilder.dto.User;
 import lombok.Getter;
 import lombok.experimental.SuperBuilder;
 
@@ -7,6 +8,6 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 public class CustomMapperContext {
     private String languageCode;
-    private String connectedUser;
-    private Boolean minimizeData = false;
+    private User connectedUser;
+    private Boolean minimizeData;
 }

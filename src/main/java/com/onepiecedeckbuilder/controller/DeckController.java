@@ -2,7 +2,6 @@ package com.onepiecedeckbuilder.controller;
 
 import com.onepiecedeckbuilder.dto.Color;
 import com.onepiecedeckbuilder.dto.Deck;
-import com.onepiecedeckbuilder.dto.User;
 import com.onepiecedeckbuilder.exceptions.*;
 import com.onepiecedeckbuilder.service.DeckService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -16,7 +15,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.data.web.SortDefault;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Set;
@@ -53,9 +51,8 @@ public class DeckController {
             @Parameter(name = "onlyUserDeck",
                     description = "If the boolean value is true, it will return only the deck created by the user connected")
             Boolean onlyUserDeck) throws UserUnauthorizedException {
-        User connectedUser = getConnectedUser();
         return deckService.list(
-                pageable, onlyUserDeck, colors, keyword, connectedUser, onlyFavorite,
+                pageable, onlyUserDeck, colors, keyword, onlyFavorite,
                 LocaleContextHolder.getLocale().getLanguage()
         );
     }
@@ -79,16 +76,14 @@ public class DeckController {
     public Deck read(
             @Parameter(description = "ID of the deck")
             @PathVariable UUID id) throws DeckNotFoundException {
-        User connectedUser = getConnectedUser();
-        return deckService.read(id, LocaleContextHolder.getLocale().getLanguage(),
-                connectedUser != null ? connectedUser.getMail() : "");
+        return deckService.read(id, LocaleContextHolder.getLocale().getLanguage());
     }
 
 
     @Operation(summary = "Create a deck for the User Authenticated")
     @PostMapping
     public Deck create(@RequestBody Deck deck) throws DeckInvalidException, UserUnauthorizedException {
-        return deckService.create(deck.setUser(getConnectedUser()), LocaleContextHolder.getLocale().getLanguage());
+        return deckService.create(deck, LocaleContextHolder.getLocale().getLanguage());
     }
 
 
@@ -96,14 +91,14 @@ public class DeckController {
     @PostMapping("{id}/favorite")
     public Deck favorite(@Parameter(description = "ID of the deck")
                          @PathVariable UUID id) throws DeckNotFoundException, DeckAlreadyFavoritedException, DeckNotFavoritedException {
-        return deckService.favorite(id, getConnectedUser(), LocaleContextHolder.getLocale().getLanguage());
+        return deckService.favorite(id, LocaleContextHolder.getLocale().getLanguage());
     }
 
     @Operation(summary = "Unfavorite a deck for the User Authenticated")
     @PostMapping("{id}/unfavorite")
     public Deck unfavorite(@Parameter(description = "ID of the deck")
                            @PathVariable UUID id) throws DeckNotFoundException, DeckAlreadyFavoritedException, DeckNotFavoritedException {
-        return deckService.unfavorite(id, getConnectedUser(), LocaleContextHolder.getLocale().getLanguage());
+        return deckService.unfavorite(id, LocaleContextHolder.getLocale().getLanguage());
     }
 
     @Operation(summary = "Delete the deck with the id in the path. You need to be the owner of the deck")
@@ -111,15 +106,7 @@ public class DeckController {
     public void delete(
             @Parameter(description = "ID of the deck")
             @PathVariable UUID id) throws DeckOwnershipException, DeckNotFoundException {
-        deckService.delete(id, getConnectedUser());
-    }
-
-    private User getConnectedUser() {
-        String connectedMail = SecurityContextHolder.getContext().getAuthentication().getName();
-        if (connectedMail.equals("anonymousUser")) {
-            return null;
-        }
-        return new User().setMail(connectedMail);
+        deckService.delete(id);
     }
 
 }

@@ -15,4 +15,9 @@ public interface DateMapper {
     default LocalDate instantToLocalDate(Instant instant) {
         return LocalDate.ofInstant(instant, ZoneOffset.UTC);
     }
+
+    @Named("localDateToInstant")
+    default Instant localDateToInstant(LocalDate date) {
+        return date != null ? date.atStartOfDay().toInstant(ZoneOffset.UTC) : null;
+    }
 }

@@ -1,9 +1,7 @@
 package com.onepiecedeckbuilder.repository.specification;
 
 import com.onepiecedeckbuilder.dto.Color;
-import com.onepiecedeckbuilder.entity.CardEntity;
-import com.onepiecedeckbuilder.entity.DeckEntity;
-import com.onepiecedeckbuilder.entity.UserEntity;
+import com.onepiecedeckbuilder.entity.*;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.SetJoin;
@@ -16,8 +14,6 @@ import java.util.Set;
 @UtilityClass
 public class DeckSpecification {
 
-    private static final String DESCRIPTION_FIELD = "description";
-
     public static Specification<DeckEntity> distinct() {
         return (root, query, cb) -> {
             query.distinct(true);
@@ -26,7 +22,7 @@ public class DeckSpecification {
     }
 
     public static Specification<DeckEntity> byUserMail(String mail) {
-        return ((root, criteriaQuery, criteriaBuilder) -> criteriaBuilder.equal(root.get("user").get("mail"), mail));
+        return ((root, criteriaQuery, criteriaBuilder) -> criteriaBuilder.equal(root.get(DeckEntity_.USER).get(UserEntity_.MAIL), mail));
     }
 
     public static Specification<DeckEntity> byKeyword(String keyword) {
@@ -38,19 +34,19 @@ public class DeckSpecification {
                     predicateWord =
                             criteriaBuilder.and(
                                     criteriaBuilder.or(
-                                            criteriaBuilder.isNull(root.get(DESCRIPTION_FIELD))
+                                            criteriaBuilder.isNull(root.get(DeckEntity_.DESCRIPTION))
                                             , criteriaBuilder.not(
-                                                    criteriaBuilder.like(criteriaBuilder.lower(root.get(DESCRIPTION_FIELD)),
+                                                    criteriaBuilder.like(criteriaBuilder.lower(root.get(DeckEntity_.DESCRIPTION)),
                                                             "%" + word.substring(1).toLowerCase() + "%")
                                             )
                                     ),
-                                    criteriaBuilder.not(criteriaBuilder.like(criteriaBuilder.lower(root.get("name")),
+                                    criteriaBuilder.not(criteriaBuilder.like(criteriaBuilder.lower(root.get(DeckEntity_.NAME)),
                                             "%" + word.substring(1).toLowerCase() + "%")));
                 } else {
                     predicateWord =
                             criteriaBuilder.or(
-                                    criteriaBuilder.like(criteriaBuilder.lower(root.get(DESCRIPTION_FIELD)), "%" + word.toLowerCase() + "%"),
-                                    criteriaBuilder.like(criteriaBuilder.lower(root.get("name")), "%" + word.toLowerCase() + "%"));
+                                    criteriaBuilder.like(criteriaBuilder.lower(root.get(DeckEntity_.DESCRIPTION)), "%" + word.toLowerCase() + "%"),
+                                    criteriaBuilder.like(criteriaBuilder.lower(root.get(DeckEntity_.NAME)), "%" + word.toLowerCase() + "%"));
                 }
 
                 if (predicate != null) {
@@ -65,16 +61,16 @@ public class DeckSpecification {
 
     public static Specification<DeckEntity> byColor(Set<Color> colors) {
         return ((root, criteriaQuery, criteriaBuilder) -> {
-            Join<DeckEntity, CardEntity> leaderJoin = root.join("leader");
-            Join<CardEntity, Color> colorsJoin = leaderJoin.join("colors");
+            Join<DeckEntity, CardEntity> leaderJoin = root.join(DeckEntity_.LEADER);
+            Join<CardEntity, Color> colorsJoin = leaderJoin.join(CardEntity_.COLORS);
             return colorsJoin.in(colors);
         });
     }
 
     public static Specification<DeckEntity> byUserFavoriteDeck(String mail) {
         return ((root, criteriaQuery, criteriaBuilder) -> {
-            SetJoin<DeckEntity, UserEntity> join = root.joinSet("usersFavorite");
-            return join.get("mail").in(mail);
+            SetJoin<DeckEntity, UserEntity> join = root.joinSet(DeckEntity_.USERS_FAVORITE);
+            return join.get(UserEntity_.MAIL).in(mail);
         });
     }
 }

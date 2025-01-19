@@ -27,12 +27,11 @@ import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.util.CollectionUtils;
+import org.springframework.util.MultiValueMap;
 
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -51,9 +50,10 @@ class DeckControllerTest {
     @ParameterizedTest
     @MethodSource("provideParametersAndExpectedResults")
     @DisplayName("List should return filtered decks based on various parameters")
-    void list_shouldReturnFilteredDecksMatchingParameters(String queryParams, List<Deck> expectedDecks) throws Exception {
+    void list_shouldReturnFilteredDecksMatchingParameters(MultiValueMap<String, String> queryParameters, List<Deck> expectedDecks) throws Exception {
 
-        MvcResult mvcResult = this.mockMvc.perform(get("/decks?" + queryParams)
+        MvcResult mvcResult = this.mockMvc.perform(get("/decks")
+                        .queryParams(queryParameters)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andReturn();
@@ -132,7 +132,8 @@ class DeckControllerTest {
     @Test
     @DisplayName("List should return 401 unauthorized when onlyFavorite is true and user is not authenticated")
     void list_shouldReturn401Unauthorized_whenOnlyFavoriteTrueAndUserNotAuthenticated() throws Exception {
-        this.mockMvc.perform(get("/decks?onlyFavorite=true")
+        this.mockMvc.perform(get("/decks")
+                        .queryParam("onlyFavorite", "true")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isUnauthorized());
     }
@@ -140,7 +141,8 @@ class DeckControllerTest {
     @Test
     @DisplayName("List should return 401 unauthorized when onlyUserDeck is true and user is not authenticated")
     void list_shouldReturn401Unauthorized_whenOnlyUserDeckTrueAndUserNotAuthenticated() throws Exception {
-        this.mockMvc.perform(get("/decks?onlyUserDeck=true")
+        this.mockMvc.perform(get("/decks")
+                        .queryParam("onlyUserDeck", "true")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isUnauthorized());
     }
@@ -167,7 +169,6 @@ class DeckControllerTest {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
         Deck actualDeck = objectMapper.readValue(jsonResponse, Deck.class);
-        System.out.println(actualDeck.toString());
         assertThat(actualDeck.getId()).isEqualTo(UUID.fromString(searchedDeckID));
         assertThat(actualDeck.getCards()).hasSize(50);
     }
@@ -395,10 +396,25 @@ class DeckControllerTest {
 
     private static Stream<Arguments> provideParametersAndExpectedResults() {
         return Stream.of(
-                Arguments.of("page=0&size=10", List.of(new Deck().setId(UUID.fromString("97e852fe-3810-4f60-a143-da10e7c8a760")),
-                        new Deck().setId(UUID.fromString("97e852fe-3810-4f60-a143-da10e7c8a680")))),
-                Arguments.of("page=0&size=10&keyword=luffy !starter", Collections.emptyList()),
-                Arguments.of("page=0&size=10&color=RED", List.of(new Deck().setId(UUID.fromString("97e852fe-3810-4f60-a143-da10e7c8a760"))))
+                Arguments.of(CollectionUtils.toMultiValueMap(Map.of(
+                        "page", List.of("0"),
+                        "size", List.of("10")
+                )), List.of(
+                        new Deck().setId(UUID.fromString("97e852fe-3810-4f60-a143-da10e7c8a760")),
+                        new Deck().setId(UUID.fromString("97e852fe-3810-4f60-a143-da10e7c8a680"))
+                )),
+                Arguments.of(CollectionUtils.toMultiValueMap(Map.of(
+                        "page", List.of("0"),
+                        "size", List.of("10"),
+                        "keyword", List.of("luffy !starter")
+                )), Collections.emptyList()),
+                Arguments.of(CollectionUtils.toMultiValueMap(Map.of(
+                        "page", List.of("0"),
+                        "size", List.of("10"),
+                        "color", List.of("RED")
+                )), List.of(
+                        new Deck().setId(UUID.fromString("97e852fe-3810-4f60-a143-da10e7c8a760"))
+                ))
         );
     }
 

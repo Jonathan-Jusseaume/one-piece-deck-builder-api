@@ -16,6 +16,7 @@ spring:
       hibernate:
         jdbc:
           time_zone: UTC
+    show-sql: true
   liquibase:
     change-log: db/changelog/changelog-master-h2.yaml
   security:

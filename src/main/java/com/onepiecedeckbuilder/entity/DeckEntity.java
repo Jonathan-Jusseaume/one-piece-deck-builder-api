@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import org.hibernate.annotations.BatchSize;
 
 import java.time.Instant;
 import java.util.List;
@@ -34,6 +35,7 @@ public class DeckEntity {
             joinColumns = @JoinColumn(name = "DECK_ID"),
             inverseJoinColumns = @JoinColumn(name = "CARD_ID")
     )
+    @BatchSize(size = 25)
     private List<CardEntity> cards;
 
     @ManyToMany(cascade = CascadeType.PERSIST)

@@ -2,6 +2,7 @@ package com.onepiecedeckbuilder.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;
+import org.hibernate.annotations.BatchSize;
 
 import java.util.Set;
 
@@ -16,5 +17,6 @@ public class TagEntity {
 
     @OneToMany
     @JoinColumn(name = "TAG_ID")
+    @BatchSize(size = 25)
     private Set<TagDescriptionEntity> descriptions;
 }

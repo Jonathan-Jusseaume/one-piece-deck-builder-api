@@ -7,6 +7,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import org.hibernate.annotations.BatchSize;
 
 import java.util.List;
 import java.util.Set;
@@ -32,12 +33,14 @@ public class CardEntity {
 
     @OneToMany
     @JoinColumn(name = "CARD_ID")
+    @BatchSize(size = 25)
     private Set<CardDescriptionEntity> descriptions;
 
     @ElementCollection(targetClass = Color.class, fetch = FetchType.EAGER)
     @CollectionTable(name = "UT_CARD_COLOR", joinColumns = @JoinColumn(name = "CARD_ID"))
     @Column(name = "COLOR")
     @Enumerated(EnumType.STRING)
+    @BatchSize(size = 25)
     private List<Color> colors;
 
     @ManyToMany
@@ -45,10 +48,12 @@ public class CardEntity {
             joinColumns = @JoinColumn(name = "CARD_ID"),
             inverseJoinColumns = @JoinColumn(name = "TAG_ID")
     )
+    @BatchSize(size = 25)
     private Set<TagEntity> tags;
 
     @OneToMany
     @JoinColumn(name = "CARD_ID")
+    @BatchSize(size = 25)
     private Set<CardImageEntity> images;
 
     @Column(name = "COST")

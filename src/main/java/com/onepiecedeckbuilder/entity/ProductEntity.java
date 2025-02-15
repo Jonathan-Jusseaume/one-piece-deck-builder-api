@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import org.hibernate.annotations.BatchSize;
 
 import java.time.Instant;
 import java.util.Set;
@@ -24,6 +25,7 @@ public class ProductEntity {
 
     @OneToMany
     @JoinColumn(name = "PRODUCT_ID")
+    @BatchSize(size = 25)
     private Set<ProductDescriptionEntity> descriptions;
 
 }

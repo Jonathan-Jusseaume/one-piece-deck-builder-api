@@ -31,6 +31,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.MultiValueMap;
 
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Stream;
 
@@ -169,8 +170,19 @@ class DeckControllerTest {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
         Deck actualDeck = objectMapper.readValue(jsonResponse, Deck.class);
-        assertThat(actualDeck.getId()).isEqualTo(UUID.fromString(searchedDeckID));
-        assertThat(actualDeck.getCards()).hasSize(50);
+        Deck expectedDeck = new Deck()
+                .setId(UUID.fromString(searchedDeckID))
+                .setCreationDate(LocalDate.of(2022, 11, 12))
+                .setCountFavorites(1)
+                .setFavorite(false)
+                .setDescription("Example of a deck. This is the second starter")
+                .setName("KID STARTER")
+                .setLeader(new Card().setId("ST02-001"));
+
+        assertThat(expectedDeck).usingRecursiveComparison()
+                //.ignoringFields("cards", "leader")
+                .ignoringActualNullFields()
+                .isEqualTo(actualDeck);
     }
 
     @Test

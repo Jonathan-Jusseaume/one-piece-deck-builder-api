@@ -1,8 +1,10 @@
 package com.onepiecedeckbuilder.service;
 
 import com.onepiecedeckbuilder.dto.Card;
+import com.onepiecedeckbuilder.dto.PagingResultWithFilters;
 import com.onepiecedeckbuilder.entity.CardEntity;
 import com.onepiecedeckbuilder.mapper.CardMapper;
+import com.onepiecedeckbuilder.mapper.PaginationMapper;
 import com.onepiecedeckbuilder.mapper.context.CustomMapperContext;
 import com.onepiecedeckbuilder.repository.CardRepository;
 import com.onepiecedeckbuilder.repository.search.CardSearch;
@@ -11,7 +13,6 @@ import com.onepiecedeckbuilder.repository.specification.SpecificationBuilder;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
@@ -28,11 +29,13 @@ public class CardService {
 
     private final CardMapper cardMapper;
 
-    public Page<Card> list(CardSearch cardSearch,
-                           String languageCode) {
+    private final PaginationMapper paginationMapper;
+
+    public PagingResultWithFilters<Card, CardSearch> list(CardSearch cardSearch,
+                                                          String languageCode) {
         Page<CardEntity> results = cardRepository.findAll(
                 convertCardSearchToSpecification(cardSearch),
-                cardSearch.getPageable()
+                paginationMapper.getPageable(cardSearch.getPagination())
         );
 
         List<Card> cards = results.getContent()
@@ -42,8 +45,14 @@ public class CardService {
                         .languageCode(languageCode)
                         .build()))
                 .toList();
-
-        return new PageImpl<>(cards, cardSearch.getPageable(), results.getTotalElements());
+        
+        return new PagingResultWithFilters<>(cards,
+                results.getTotalPages(),
+                results.getTotalElements(),
+                results.getSize(),
+                results.getNumber(),
+                results.isEmpty(),
+                cardSearch);
     }
 
     private Specification<CardEntity> convertCardSearchToSpecification(CardSearch cardSearch) {

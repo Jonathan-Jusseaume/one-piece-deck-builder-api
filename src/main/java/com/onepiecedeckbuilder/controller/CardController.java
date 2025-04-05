@@ -1,9 +1,6 @@
 package com.onepiecedeckbuilder.controller;
 
-import com.onepiecedeckbuilder.dto.Card;
-import com.onepiecedeckbuilder.dto.Color;
-import com.onepiecedeckbuilder.dto.Rarity;
-import com.onepiecedeckbuilder.dto.Type;
+import com.onepiecedeckbuilder.dto.*;
 import com.onepiecedeckbuilder.repository.search.CardSearch;
 import com.onepiecedeckbuilder.service.CardService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -11,12 +8,11 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.i18n.LocaleContextHolder;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.web.PageableDefault;
-import org.springframework.data.web.SortDefault;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Set;
 
@@ -30,10 +26,19 @@ public class CardController {
 
     @Operation(summary = "Get a page of the card list matching different criteria")
     @GetMapping
-    public Page<Card> list(
-            @PageableDefault(size = 25)
-            @SortDefault(sort = "id", direction = Sort.Direction.ASC)
-            Pageable pageable,
+    public PagingResultWithFilters<Card, CardSearch> list(
+            @RequestParam(required = false, defaultValue = "0")
+            @Parameter(name = "page", description = "The page number. Start from 0")
+            Integer page,
+            @RequestParam(required = false, defaultValue = "25")
+            @Parameter(name = "size", description = "Size of the page")
+            Integer size,
+            @RequestParam(required = false, defaultValue = "id")
+            @Parameter(name = "sort", description = "Field to sort")
+            String sort,
+            @RequestParam(required = false, defaultValue = "DESC")
+            @Parameter(name = "sort", description = "Direction of sort")
+            Sort.Direction direction,
             @RequestParam(required = false, name = "type")
             @Parameter(name = "type",
                     description = "Type of the card. You can put multiple values")
@@ -68,7 +73,12 @@ public class CardController {
                             "in order to search cards which don't have this word.")
             String keyword) {
         CardSearch cardSearch = CardSearch.builder()
-                .pageable(pageable)
+                .pagination(PaginationRequest.builder()
+                        .page(page)
+                        .size(size)
+                        .sort(sort)
+                        .direction(direction)
+                        .build())
                 .colors(colors)
                 .keyword(keyword)
                 .types(types)

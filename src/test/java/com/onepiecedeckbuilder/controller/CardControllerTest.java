@@ -1,12 +1,11 @@
 package com.onepiecedeckbuilder.controller;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.onepiecedeckbuilder.dto.Card;
+import com.onepiecedeckbuilder.dto.PagingResultWithFilters;
+import com.onepiecedeckbuilder.repository.search.CardSearch;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -15,8 +14,6 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
@@ -25,6 +22,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.MultiValueMap;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
@@ -56,10 +54,10 @@ class CardControllerTest {
 
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
-        TypeReference<RestResponsePage<Card>> cardPageTypeReference = new TypeReference<>() {
+        TypeReference<PagingResultWithFilters<Card, CardSearch>> cardPageTypeReference = new TypeReference<>() {
         };
-        RestResponsePage<Card> actualPage = objectMapper.readValue(jsonResponse, cardPageTypeReference);
-        List<Card> actualCards = actualPage.getContent();
+        PagingResultWithFilters<Card, CardSearch> actualPage = objectMapper.readValue(jsonResponse, cardPageTypeReference);
+        Collection<Card> actualCards = actualPage.getContent();
 
         assertThat(actualCards
                 .stream()
@@ -104,22 +102,5 @@ class CardControllerTest {
         );
     }
 
-    public static class RestResponsePage<T> extends PageImpl<T> {
-        @JsonCreator
-        public RestResponsePage(@JsonProperty("content") List<T> content,
-                                @JsonProperty("number") int number,
-                                @JsonProperty("size") int size,
-                                @JsonProperty("totalElements") long totalElements,
-                                @JsonProperty("pageable") JsonNode pageable,
-                                @JsonProperty("last") boolean last,
-                                @JsonProperty("totalPages") int totalPages,
-                                @JsonProperty("sort") JsonNode sort,
-                                @JsonProperty("first") boolean first,
-                                @JsonProperty("empty") boolean empty,
-                                @JsonProperty("numberOfElements") int numberOfElements) {
-            super(content, PageRequest.of(number, size), totalElements);
-        }
-
-    }
 
 }

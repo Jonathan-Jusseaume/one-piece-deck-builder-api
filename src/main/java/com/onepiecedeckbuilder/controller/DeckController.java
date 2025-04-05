@@ -2,6 +2,8 @@ package com.onepiecedeckbuilder.controller;
 
 import com.onepiecedeckbuilder.dto.Color;
 import com.onepiecedeckbuilder.dto.Deck;
+import com.onepiecedeckbuilder.dto.PaginationRequest;
+import com.onepiecedeckbuilder.dto.PagingResultWithFilters;
 import com.onepiecedeckbuilder.exceptions.*;
 import com.onepiecedeckbuilder.repository.search.DeckSearch;
 import com.onepiecedeckbuilder.service.DeckService;
@@ -11,11 +13,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.i18n.LocaleContextHolder;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.web.PageableDefault;
-import org.springframework.data.web.SortDefault;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Set;
@@ -30,10 +28,19 @@ public class DeckController {
 
     @Operation(summary = "List decks matching filters")
     @GetMapping
-    public Page<Deck> list(
-            @PageableDefault(size = 25)
-            @SortDefault(sort = {"countFavorites", "creationDate"}, direction = Sort.Direction.DESC)
-            Pageable pageable,
+    public PagingResultWithFilters<Deck, DeckSearch> list(
+            @RequestParam(required = false, defaultValue = "0")
+            @Parameter(name = "page", description = "The page number. Start from 0")
+            Integer page,
+            @RequestParam(required = false, defaultValue = "25")
+            @Parameter(name = "size", description = "Size of the page")
+            Integer size,
+            @RequestParam(required = false, defaultValue = "countFavorites,creationDate")
+            @Parameter(name = "sort", description = "Field to sort")
+            String sort,
+            @RequestParam(required = false, defaultValue = "DESC")
+            @Parameter(name = "sort", description = "Direction of sort")
+            Sort.Direction direction,
             @RequestParam(required = false, name = "color")
             @Parameter(name = "color",
                     description = "Color Id of the leader of the deck. You can put multiple values")
@@ -57,7 +64,12 @@ public class DeckController {
                 .onlyFavorite(onlyFavorite)
                 .colors(colors)
                 .keyword(keyword)
-                .pageable(pageable)
+                .pagination(PaginationRequest.builder()
+                        .page(page)
+                        .size(size)
+                        .sort(sort)
+                        .direction(direction)
+                        .build())
                 .build();
 
         return deckService.list(

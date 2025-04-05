@@ -1,13 +1,12 @@
 package com.onepiecedeckbuilder.controller;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.onepiecedeckbuilder.dto.Card;
 import com.onepiecedeckbuilder.dto.Deck;
+import com.onepiecedeckbuilder.dto.PagingResultWithFilters;
+import com.onepiecedeckbuilder.repository.search.DeckSearch;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -18,8 +17,6 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -63,10 +60,10 @@ class DeckControllerTest {
 
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
-        TypeReference<RestResponsePage<Deck>> deckPageTypeReference = new TypeReference<>() {
+        TypeReference<PagingResultWithFilters<Deck, DeckSearch>> deckPageTypeReference = new TypeReference<>() {
         };
-        RestResponsePage<Deck> actualPage = objectMapper.readValue(jsonResponse, deckPageTypeReference);
-        List<Deck> actualDecks = actualPage.getContent();
+        PagingResultWithFilters<Deck, DeckSearch> actualPage = objectMapper.readValue(jsonResponse, deckPageTypeReference);
+        Collection<Deck> actualDecks = actualPage.getContent();
 
         assertThat(actualDecks
                 .stream()
@@ -91,10 +88,10 @@ class DeckControllerTest {
 
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
-        TypeReference<RestResponsePage<Deck>> deckPageTypeReference = new TypeReference<>() {
+        TypeReference<PagingResultWithFilters<Deck, DeckSearch>> deckPageTypeReference = new TypeReference<>() {
         };
-        RestResponsePage<Deck> actualPage = objectMapper.readValue(jsonResponse, deckPageTypeReference);
-        List<Deck> actualDecks = actualPage.getContent();
+        PagingResultWithFilters<Deck, DeckSearch> actualPage = objectMapper.readValue(jsonResponse, deckPageTypeReference);
+        Collection<Deck> actualDecks = actualPage.getContent();
 
         assertThat(actualDecks
                 .stream()
@@ -116,10 +113,10 @@ class DeckControllerTest {
 
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
-        TypeReference<RestResponsePage<Deck>> deckPageTypeReference = new TypeReference<>() {
+        TypeReference<PagingResultWithFilters<Deck, DeckSearch>> deckPageTypeReference = new TypeReference<>() {
         };
-        RestResponsePage<Deck> actualPage = objectMapper.readValue(jsonResponse, deckPageTypeReference);
-        List<Deck> actualDecks = actualPage.getContent();
+        PagingResultWithFilters<Deck, DeckSearch> actualPage = objectMapper.readValue(jsonResponse, deckPageTypeReference);
+        Collection<Deck> actualDecks = actualPage.getContent();
 
         assertThat(actualDecks
                 .stream()
@@ -457,21 +454,4 @@ class DeckControllerTest {
         return cards;
     }
 
-    public static class RestResponsePage<T> extends PageImpl<T> {
-        @JsonCreator
-        public RestResponsePage(@JsonProperty("content") List<T> content,
-                                @JsonProperty("number") int number,
-                                @JsonProperty("size") int size,
-                                @JsonProperty("totalElements") long totalElements,
-                                @JsonProperty("pageable") JsonNode pageable,
-                                @JsonProperty("last") boolean last,
-                                @JsonProperty("totalPages") int totalPages,
-                                @JsonProperty("sort") JsonNode sort,
-                                @JsonProperty("first") boolean first,
-                                @JsonProperty("empty") boolean empty,
-                                @JsonProperty("numberOfElements") int numberOfElements) {
-            super(content, PageRequest.of(number, size), totalElements);
-        }
-
-    }
 }

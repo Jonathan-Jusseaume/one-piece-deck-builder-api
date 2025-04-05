@@ -6,6 +6,7 @@ import com.onepiecedeckbuilder.entity.DeckEntity;
 import com.onepiecedeckbuilder.entity.UserEntity;
 import com.onepiecedeckbuilder.exceptions.*;
 import com.onepiecedeckbuilder.mapper.DeckMapper;
+import com.onepiecedeckbuilder.mapper.PaginationMapper;
 import com.onepiecedeckbuilder.mapper.UserMapper;
 import com.onepiecedeckbuilder.mapper.context.CustomMapperContext;
 import com.onepiecedeckbuilder.repository.CardRepository;
@@ -16,7 +17,6 @@ import com.onepiecedeckbuilder.repository.specification.SpecificationBuilder;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
@@ -46,7 +46,9 @@ public class DeckService {
 
     private final UserMapper userMapper;
 
-    public Page<Deck> list(DeckSearch deckSearch, String language) throws UserUnauthorizedException {
+    private final PaginationMapper paginationMapper;
+
+    public PagingResultWithFilters<Deck, DeckSearch> list(DeckSearch deckSearch, String language) throws UserUnauthorizedException {
         User connectedUser = userService.getConnectedUser();
         if ((deckSearch.getOnlyFavorite() || deckSearch.getOnlyUserDeck()) && connectedUser == null) {
             throw new UserUnauthorizedException();
@@ -54,9 +56,10 @@ public class DeckService {
 
         Page<DeckEntity> results = deckRepository.findAll(
                 convertDeckSearchToSpecifications(deckSearch, connectedUser),
-                deckSearch.getPageable()
+                paginationMapper.getPageable(deckSearch.getPagination())
         );
-        return new PageImpl<>(
+
+        return new PagingResultWithFilters<>(
                 results.getContent()
                         .stream()
                         .map(deckEntity -> deckMapper.toDto(deckEntity,
@@ -67,7 +70,12 @@ public class DeckService {
                                         .build())
                         )
                         .toList(),
-                deckSearch.getPageable(), results.getTotalElements());
+                results.getTotalPages(),
+                results.getTotalElements(),
+                results.getSize(),
+                results.getNumber(),
+                results.isEmpty(),
+                deckSearch);
     }
 
     private Specification<DeckEntity> convertDeckSearchToSpecifications(DeckSearch deckSearch, User connectedUser) {

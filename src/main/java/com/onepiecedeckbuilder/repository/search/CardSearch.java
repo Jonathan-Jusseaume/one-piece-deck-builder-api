@@ -1,18 +1,24 @@
 package com.onepiecedeckbuilder.repository.search;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.onepiecedeckbuilder.dto.Color;
+import com.onepiecedeckbuilder.dto.PaginationRequest;
 import com.onepiecedeckbuilder.dto.Rarity;
 import com.onepiecedeckbuilder.dto.Type;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.SuperBuilder;
-import org.springframework.data.domain.Pageable;
 
 import java.util.Set;
 
 @SuperBuilder
 @Getter
+@NoArgsConstructor
+@Setter
+@JsonIgnoreProperties(ignoreUnknown = true, value = {"pageable"})
 public class CardSearch {
-    private Pageable pageable;
+    private PaginationRequest pagination;
     private Set<Color> colors;
     private String keyword;
     private Set<Type> types;

@@ -28,4 +28,8 @@ public class CardImageEntity {
     @JoinColumn(name = "PRODUCT_ID")
     private ProductEntity product;
 
+    @ManyToOne
+    @JoinColumn(name = "CARD_ID")
+    private CardEntity card;
+
 }

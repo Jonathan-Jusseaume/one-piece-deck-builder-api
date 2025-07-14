@@ -1,6 +1,5 @@
 package com.onepiecedeckbuilder.repository.search;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.onepiecedeckbuilder.dto.Color;
 import com.onepiecedeckbuilder.dto.PaginationRequest;
 import com.onepiecedeckbuilder.dto.Rarity;
@@ -16,7 +15,6 @@ import java.util.Set;
 @Getter
 @NoArgsConstructor
 @Setter
-@JsonIgnoreProperties(ignoreUnknown = true, value = {"pageable"})
 public class CardSearch {
     private PaginationRequest pagination;
     private Set<Color> colors;

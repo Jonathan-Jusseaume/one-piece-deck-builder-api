@@ -4,13 +4,12 @@ import com.onepiecedeckbuilder.dto.Attribute;
 import com.onepiecedeckbuilder.dto.Color;
 import com.onepiecedeckbuilder.dto.Type;
 import jakarta.persistence.*;
+import java.util.List;
+import java.util.Set;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import org.hibernate.annotations.BatchSize;
-
-import java.util.List;
-import java.util.Set;
 
 @Getter
 @Setter
@@ -37,16 +36,20 @@ public class CardEntity {
     private Set<CardDescriptionEntity> descriptions;
 
     @ElementCollection(targetClass = Color.class, fetch = FetchType.EAGER)
-    @CollectionTable(name = "UT_CARD_COLOR", joinColumns = @JoinColumn(name = "CARD_ID"))
+    @CollectionTable(
+        name = "UT_CARD_COLOR",
+        joinColumns = @JoinColumn(name = "CARD_ID")
+    )
     @Column(name = "COLOR")
     @Enumerated(EnumType.STRING)
     @BatchSize(size = 25)
     private List<Color> colors;
 
     @ManyToMany
-    @JoinTable(name = "UT_CARD_TAG",
-            joinColumns = @JoinColumn(name = "CARD_ID"),
-            inverseJoinColumns = @JoinColumn(name = "TAG_ID")
+    @JoinTable(
+        name = "UT_CARD_TAG",
+        joinColumns = @JoinColumn(name = "CARD_ID"),
+        inverseJoinColumns = @JoinColumn(name = "TAG_ID")
     )
     @BatchSize(size = 25)
     private Set<TagEntity> tags;
@@ -67,5 +70,4 @@ public class CardEntity {
 
     @Column(name = "COUNTER")
     private Integer counter;
-
 }

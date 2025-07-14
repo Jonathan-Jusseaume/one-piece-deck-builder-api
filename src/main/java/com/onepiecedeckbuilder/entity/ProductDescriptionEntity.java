@@ -24,5 +24,4 @@ public class ProductDescriptionEntity {
 
     @Column(name = "NAME")
     private String name;
-
 }

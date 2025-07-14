@@ -5,11 +5,10 @@ import com.onepiecedeckbuilder.mapper.TagMapper;
 import com.onepiecedeckbuilder.mapper.context.CustomMapperContext;
 import com.onepiecedeckbuilder.repository.TagRepository;
 import jakarta.transaction.Transactional;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-
 import java.util.Comparator;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
@@ -21,14 +20,18 @@ public class TagService {
     private final TagMapper tagMapper;
 
     public List<Tag> list(String languageCode) {
-        return tagRepository.findAll()
-                .stream()
-                .map(tagEntity -> tagMapper.toDto(tagEntity, CustomMapperContext
-                        .builder()
+        return tagRepository
+            .findAll()
+            .stream()
+            .map(tagEntity ->
+                tagMapper.toDto(
+                    tagEntity,
+                    CustomMapperContext.builder()
                         .languageCode(languageCode)
-                        .build()))
-                .sorted(Comparator.comparing(Tag::getLabel))
-                .toList();
+                        .build()
+                )
+            )
+            .sorted(Comparator.comparing(Tag::getLabel))
+            .toList();
     }
-
 }

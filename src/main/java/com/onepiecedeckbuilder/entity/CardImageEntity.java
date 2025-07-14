@@ -31,5 +31,4 @@ public class CardImageEntity {
     @ManyToOne
     @JoinColumn(name = "CARD_ID")
     private CardEntity card;
-
 }

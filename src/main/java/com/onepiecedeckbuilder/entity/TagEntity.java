@@ -1,10 +1,9 @@
 package com.onepiecedeckbuilder.entity;
 
 import jakarta.persistence.*;
+import java.util.Set;
 import lombok.Getter;
 import org.hibernate.annotations.BatchSize;
-
-import java.util.Set;
 
 @Getter
 @Entity

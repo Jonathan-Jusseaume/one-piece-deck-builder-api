@@ -5,11 +5,10 @@ import com.onepiecedeckbuilder.mapper.ProductMapper;
 import com.onepiecedeckbuilder.mapper.context.CustomMapperContext;
 import com.onepiecedeckbuilder.repository.ProductRepository;
 import jakarta.transaction.Transactional;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-
 import java.util.Comparator;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
@@ -21,16 +20,18 @@ public class ProductService {
     private final ProductMapper productMapper;
 
     public List<Product> list(String languageCode) {
-        return productRepository.findAll()
-                .stream()
-                .map(productEntity -> productMapper.toDto(productEntity,
-                        CustomMapperContext
-                                .builder()
-                                .languageCode(languageCode)
-                                .build()))
-                .sorted(Comparator.comparing(Product::getLabel))
-                .toList();
+        return productRepository
+            .findAll()
+            .stream()
+            .map(productEntity ->
+                productMapper.toDto(
+                    productEntity,
+                    CustomMapperContext.builder()
+                        .languageCode(languageCode)
+                        .build()
+                )
+            )
+            .sorted(Comparator.comparing(Product::getLabel))
+            .toList();
     }
-
 }
-

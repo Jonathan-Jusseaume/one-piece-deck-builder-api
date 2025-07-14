@@ -11,5 +11,5 @@ public enum Rarity {
     SR,
     SEC,
     SP_CARD,
-    P
+    P,
 }

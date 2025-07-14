@@ -3,13 +3,12 @@ package com.onepiecedeckbuilder.controller;
 import com.onepiecedeckbuilder.dto.Tag;
 import com.onepiecedeckbuilder.service.TagService;
 import io.swagger.v3.oas.annotations.Operation;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/tags")
@@ -23,5 +22,4 @@ public class TagController {
     public List<Tag> list() {
         return tagService.list(LocaleContextHolder.getLocale().getLanguage());
     }
-
 }

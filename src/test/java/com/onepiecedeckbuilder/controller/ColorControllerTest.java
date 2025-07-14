@@ -1,8 +1,14 @@
 package com.onepiecedeckbuilder.controller;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.onepiecedeckbuilder.dto.Color;
+import java.nio.charset.StandardCharsets;
+import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -13,13 +19,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
-
-import java.nio.charset.StandardCharsets;
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ExtendWith(SpringExtension.class)
@@ -32,18 +31,25 @@ class ColorControllerTest {
     @Test
     @DisplayName("Should return all colors")
     void shouldReturnAllColorsForGivenLanguage() throws Exception {
-        MvcResult mvcResult = this.mockMvc.perform(get("/colors")
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andReturn();
+        MvcResult mvcResult = this.mockMvc.perform(
+                get("/colors").accept(MediaType.APPLICATION_JSON)
+            )
+            .andExpect(status().isOk())
+            .andReturn();
 
-        String jsonResponse = mvcResult.getResponse().getContentAsString(StandardCharsets.UTF_8);
+        String jsonResponse = mvcResult
+            .getResponse()
+            .getContentAsString(StandardCharsets.UTF_8);
         ObjectMapper objectMapper = new ObjectMapper();
-        TypeReference<List<Color>> colorListTypeReference = new TypeReference<>() {
-        };
-        List<Color> actual = objectMapper.readValue(jsonResponse, colorListTypeReference);
+        TypeReference<List<Color>> colorListTypeReference =
+            new TypeReference<>() {};
+        List<Color> actual = objectMapper.readValue(
+            jsonResponse,
+            colorListTypeReference
+        );
 
-        assertThat(actual).containsExactlyInAnyOrderElementsOf(List.of(Color.values()));
+        assertThat(actual).containsExactlyInAnyOrderElementsOf(
+            List.of(Color.values())
+        );
     }
-
 }

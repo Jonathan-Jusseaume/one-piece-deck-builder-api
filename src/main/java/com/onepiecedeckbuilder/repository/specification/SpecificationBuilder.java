@@ -1,9 +1,8 @@
 package com.onepiecedeckbuilder.repository.specification;
 
-import org.springframework.data.jpa.domain.Specification;
-
 import java.util.ArrayList;
 import java.util.List;
+import org.springframework.data.jpa.domain.Specification;
 
 public class SpecificationBuilder<T> {
 
@@ -24,11 +23,11 @@ public class SpecificationBuilder<T> {
             int index = 0;
             result = specifications.get(index++);
             for (; index < specifications.size(); ++index) {
-                result = Specification.where(result).and(specifications.get(index));
+                result = Specification.where(result).and(
+                    specifications.get(index)
+                );
             }
         }
         return result;
     }
-
 }
-

@@ -1,10 +1,9 @@
 package com.onepiecedeckbuilder.entity.key;
 
+import java.io.Serializable;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
-
-import java.io.Serializable;
 
 @EqualsAndHashCode
 @Getter

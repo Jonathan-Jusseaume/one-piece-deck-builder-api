@@ -3,12 +3,11 @@ package com.onepiecedeckbuilder.controller;
 import com.onepiecedeckbuilder.dto.Type;
 import com.onepiecedeckbuilder.service.TypeService;
 import io.swagger.v3.oas.annotations.Operation;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/types")
@@ -22,5 +21,4 @@ public class TypeController {
     public List<Type> list() {
         return typeService.list();
     }
-
 }

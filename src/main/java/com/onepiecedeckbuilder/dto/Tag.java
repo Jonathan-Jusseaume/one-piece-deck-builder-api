@@ -14,10 +14,14 @@ import lombok.experimental.Accessors;
 @JsonDeserialize
 @NoArgsConstructor
 @EqualsAndHashCode
-@Schema(description = "Represents a tag with an identifier and a label, used to categorize cards.")
+@Schema(
+    description = "Represents a tag with an identifier and a label, used to categorize cards."
+)
 public class Tag {
+
     @Schema(description = "Unique identifier for the tag", example = "1")
     private Long id;
+
     @Schema(description = "The label of the tag", example = "Straw Hat Crew")
     private String label;
 }

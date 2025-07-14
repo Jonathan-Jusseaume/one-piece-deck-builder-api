@@ -10,11 +10,10 @@ public class PaginationMapper {
 
     public Pageable getPageable(PaginationRequest request) {
         return PageRequest.of(
-                request.getPage(),
-                request.getSize(),
-                request.getDirection(),
-                request.getSort().split(",")
+            request.getPage(),
+            request.getSize(),
+            request.getDirection(),
+            request.getSort().split(",")
         );
     }
-
 }

@@ -13,6 +13,7 @@ import org.springframework.data.domain.Sort;
 @SuperBuilder
 @NoArgsConstructor
 public class PaginationRequest {
+
     private Integer page;
     private Integer size;
     private String sort;

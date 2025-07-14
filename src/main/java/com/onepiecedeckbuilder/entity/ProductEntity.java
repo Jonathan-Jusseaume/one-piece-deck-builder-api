@@ -1,13 +1,12 @@
 package com.onepiecedeckbuilder.entity;
 
 import jakarta.persistence.*;
+import java.time.Instant;
+import java.util.Set;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import org.hibernate.annotations.BatchSize;
-
-import java.time.Instant;
-import java.util.Set;
 
 @Getter
 @Setter
@@ -27,5 +26,4 @@ public class ProductEntity {
     @JoinColumn(name = "PRODUCT_ID")
     @BatchSize(size = 25)
     private Set<ProductDescriptionEntity> descriptions;
-
 }

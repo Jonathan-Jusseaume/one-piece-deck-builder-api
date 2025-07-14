@@ -14,10 +14,19 @@ import lombok.experimental.Accessors;
 @EqualsAndHashCode
 @Schema(description = "Represents a specific illustration of a card")
 public class CardImage {
-    @Schema(description = "Name of the illustration of the card", example = "OP01-001.png")
+
+    @Schema(
+        description = "Name of the illustration of the card",
+        example = "OP01-001.png"
+    )
     private String filename;
-    @Schema(description = "Rarity of this illustration of the card", example = "SEC")
+
+    @Schema(
+        description = "Rarity of this illustration of the card",
+        example = "SEC"
+    )
     private Rarity rarity;
+
     @Schema(description = "Product where you can find this version of the card")
     private Product product;
 }

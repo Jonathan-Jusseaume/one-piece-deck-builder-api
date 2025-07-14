@@ -9,8 +9,10 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class OnePieceCardGameDeckBuilderApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(OnePieceCardGameDeckBuilderApplication.class, args);
+        SpringApplication.run(
+            OnePieceCardGameDeckBuilderApplication.class,
+            args
+        );
         log.info("API is launched");
     }
-
 }

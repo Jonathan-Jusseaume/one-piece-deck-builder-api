@@ -1,15 +1,14 @@
 package com.onepiecedeckbuilder.entity;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.experimental.Accessors;
-import org.hibernate.annotations.BatchSize;
-
 import java.time.Instant;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.Accessors;
+import org.hibernate.annotations.BatchSize;
 
 @Getter
 @Setter
@@ -31,17 +30,19 @@ public class DeckEntity {
     private UserEntity user;
 
     @ManyToMany(cascade = CascadeType.PERSIST)
-    @JoinTable(name = "UT_DECK_CARD",
-            joinColumns = @JoinColumn(name = "DECK_ID"),
-            inverseJoinColumns = @JoinColumn(name = "CARD_ID")
+    @JoinTable(
+        name = "UT_DECK_CARD",
+        joinColumns = @JoinColumn(name = "DECK_ID"),
+        inverseJoinColumns = @JoinColumn(name = "CARD_ID")
     )
     @BatchSize(size = 25)
     private List<CardEntity> cards;
 
     @ManyToMany(cascade = CascadeType.PERSIST)
-    @JoinTable(name = "UT_DECK_FAVORITE",
-            joinColumns = @JoinColumn(name = "DECK_ID"),
-            inverseJoinColumns = @JoinColumn(name = "USER_MAIL")
+    @JoinTable(
+        name = "UT_DECK_FAVORITE",
+        joinColumns = @JoinColumn(name = "DECK_ID"),
+        inverseJoinColumns = @JoinColumn(name = "USER_MAIL")
     )
     private Set<UserEntity> usersFavorite;
 
@@ -62,7 +63,7 @@ public class DeckEntity {
             return false;
         }
         return this.getUsersFavorite()
-                .stream()
-                .anyMatch(userEntity1 -> mail.equals(userEntity1.getMail()));
+            .stream()
+            .anyMatch(userEntity1 -> mail.equals(userEntity1.getMail()));
     }
 }

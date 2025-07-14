@@ -27,5 +27,4 @@ public class CardDescriptionEntity {
 
     @Column(name = "EFFECT")
     private String effect;
-
 }

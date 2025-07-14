@@ -1,12 +1,11 @@
 package com.onepiecedeckbuilder.dto;
 
+import java.util.Collection;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
-
-import java.util.Collection;
 
 @Getter
 @Setter
@@ -24,13 +23,13 @@ public class PagingResultWithFilters<T, F> {
     private boolean empty;
 
     public PagingResultWithFilters(
-            Collection<T> content,
-            Integer totalPages,
-            long totalElements,
-            Integer size,
-            Integer page,
-            boolean empty,
-            F activeFilters
+        Collection<T> content,
+        Integer totalPages,
+        long totalElements,
+        Integer size,
+        Integer page,
+        boolean empty,
+        F activeFilters
     ) {
         this.content = content;
         this.totalPages = totalPages;
@@ -40,5 +39,4 @@ public class PagingResultWithFilters<T, F> {
         this.empty = empty;
         this.activeFilters = activeFilters;
     }
-
 }

@@ -7,6 +7,7 @@ import lombok.experimental.SuperBuilder;
 @Getter
 @SuperBuilder
 public class CustomMapperContext {
+
     private String languageCode;
     private User connectedUser;
     private Boolean minimizeData;

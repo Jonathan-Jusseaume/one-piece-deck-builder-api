@@ -22,5 +22,4 @@ public class TagDescriptionEntity {
 
     @Column(name = "NAME", nullable = false)
     private String name;
-
 }

@@ -1,8 +1,14 @@
 package com.onepiecedeckbuilder.controller;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.onepiecedeckbuilder.dto.Attribute;
+import java.nio.charset.StandardCharsets;
+import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -13,13 +19,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
-
-import java.nio.charset.StandardCharsets;
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ExtendWith(SpringExtension.class)
@@ -32,18 +31,25 @@ class AttributeControllerTest {
     @Test
     @DisplayName("Should return all attributes")
     void shouldReturnAllAttributesForGivenLanguage() throws Exception {
-        MvcResult mvcResult = this.mockMvc.perform(get("/attributes")
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andReturn();
+        MvcResult mvcResult = this.mockMvc.perform(
+                get("/attributes").accept(MediaType.APPLICATION_JSON)
+            )
+            .andExpect(status().isOk())
+            .andReturn();
 
-        String jsonResponse = mvcResult.getResponse().getContentAsString(StandardCharsets.UTF_8);
+        String jsonResponse = mvcResult
+            .getResponse()
+            .getContentAsString(StandardCharsets.UTF_8);
         ObjectMapper objectMapper = new ObjectMapper();
-        TypeReference<List<Attribute>> attributeListTypeReference = new TypeReference<>() {
-        };
-        List<Attribute> actual = objectMapper.readValue(jsonResponse, attributeListTypeReference);
+        TypeReference<List<Attribute>> attributeListTypeReference =
+            new TypeReference<>() {};
+        List<Attribute> actual = objectMapper.readValue(
+            jsonResponse,
+            attributeListTypeReference
+        );
 
-        assertThat(actual).containsExactlyInAnyOrderElementsOf(List.of(Attribute.values()));
+        assertThat(actual).containsExactlyInAnyOrderElementsOf(
+            List.of(Attribute.values())
+        );
     }
-
 }

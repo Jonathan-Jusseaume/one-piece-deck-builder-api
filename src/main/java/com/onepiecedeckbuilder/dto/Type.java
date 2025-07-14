@@ -7,5 +7,5 @@ public enum Type {
     LEADER,
     CHARACTER,
     STAGE,
-    EVENT
+    EVENT,
 }

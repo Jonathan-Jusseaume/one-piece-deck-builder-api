@@ -4,12 +4,11 @@ import com.onepiecedeckbuilder.dto.Attribute;
 import com.onepiecedeckbuilder.service.AttributeService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/attributes")
@@ -24,5 +23,4 @@ public class AttributeController {
     public List<Attribute> list() {
         return attributeService.list();
     }
-
 }
